@@ -3,7 +3,8 @@ from flet import Text, Column, colors, icons, IconButton, Control, Row, Containe
 from App.sidebar import Sidebar
 from App.login import Login
 from App.register import Register
-
+#from App.product_new import ProductNew
+from App.product_new1 import ProductNew
 class AppLayout(Row):
     def __init__(self, app, page: ft.Page, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -17,8 +18,11 @@ class AppLayout(Row):
             Text("")
         ], alignment=ft.alignment.center, horizontal_alignment=ft.alignment.center, expand=True)
         
-        #self.content = Login().create_container()
-        self.content = Register().create_user_()
+        #self.content = ProductNew().products_new(page) #add
+        #self.content = ProductNew2()
+        #self.content = Register().create_user_()
+        #self.content = Register(page)
+        self.content = Login().create_container()
         
         """self.content = Container(
          
