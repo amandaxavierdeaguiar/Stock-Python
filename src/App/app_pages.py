@@ -1,11 +1,12 @@
 import flet as ft
-from flet import Text, Column, Card, Row, Container, UserControl, icons
+from flet import Text, Column, Card, Row, Container, UserControl, ExpansionPanelList
 
 from App.app_table import AppTable
 from App.app_menu import AppMenu
-from Views.Product.ListProduct import table_data as db_product
+from Views.Product.ListProduct import table_data as db_product, category_list, brand_list
 from Views.Supplier.ListSupplier import table_data as db_supplier
 from Views.User.ListUser import table_data as db_user
+import pandas as pd
 
 list_tables = {
     0: db_product,
@@ -19,63 +20,9 @@ class AppPages(UserControl):
 
     """
 
-    def __init__(self, app, page: ft.Page, *args, **kwargs):
+    def __init__(self, page: ft.Page, *args, **kwargs):
         super().__init__()
         self.page = page
-        self.app_menu = AppMenu(self.page)
-        pages = [
-            (
-                self.app_menu.create_menu_btn(label_='Stock', icon_=icons.WAREHOUSE_OUTLINED),
-                self.create_content(0),
-            ),
-            (
-                self.app_menu.create_menu_btn(label_='Supplier', icon_=icons.PERSON_2),
-                self.create_content(1),
-            ),
-            (
-                self.app_menu.create_menu_btn(label_='Use', icon_=icons.PERSON),
-                self.create_content(2),
-            ),
-        ]
-        self.navigation_items = [navigation_item for navigation_item, _ in pages]
-        self.navigation_rail = self.app_menu.build_navigation_rail(self._navigation_change)
-        self.update_destinations()
-        self._menu_extended = True
-        self.navigation_rail.extended = True
-
-        self.menu_panel = self.app_menu.get_menu(self.navigation_rail)
-
-        page_contents = [page_content for _, [page_content, list_view] in pages]
-        self.content_area = Column(controls=page_contents, expand=True)
-
-        self.set_content()
-        self._change_displayed_page()
-
-    def select_page(self, page_number):
-        self.navigation_rail.selected_index = page_number
-        self._change_displayed_page()
-
-    def _navigation_change(self, e):
-        self._change_displayed_page()
-        self.page.update()
-
-    def _change_displayed_page(self):
-        page_number = self.navigation_rail.selected_index
-        for i, content_page in enumerate(self.content_area.controls):
-            # update selected page
-            content_page.visible = page_number == i
-
-    def update_destinations(self):
-        self.navigation_rail.destinations = self.navigation_items
-        self.navigation_rail.label_type = ft.NavigationRailLabelType.ALL,
-
-    def set_content(self, panel_=None):
-        self.controls = [self.menu_panel, self.content_area]
-        self.update_destinations()
-        self.navigation_rail.extended = self._menu_extended
-        if panel_:
-            self.menu_panel.visible = panel_
-        return self.controls
 
     @classmethod
     def create_content(cls, view=0):
@@ -87,10 +34,13 @@ class AppPages(UserControl):
         list_view = ft.ListView(
             controls=[
                 AppTable.get_table(list_tables[view]),
-            ], spacing=10, padding=10, auto_scroll=False
+            ],
+            spacing=10,
+            padding=10,
+            auto_scroll=False
         )
         content = Container(
-            border_radius=5,
+            border_radius=20,
             padding=ft.padding.all(5),
             margin=ft.margin.all(10),
             expand=True,
@@ -100,6 +50,166 @@ class AppPages(UserControl):
             adaptive=True,
         )
         return content, list_view
+
+    @classmethod
+    def create_search(cls):
+        """
+
+        :param :
+        :param :
+        :return:
+        """
+        return Container(
+            content=Column([
+                ft.Container(
+                    content=Text("Search", color=ft.colors.GREY_50, weight=ft.FontWeight.BOLD),
+                    alignment=ft.alignment.center,
+                    bgcolor=ft.colors.BLACK54,
+                    margin=10,
+                    padding=5,
+                    height=30,
+                    border=ft.border.only(top=None),
+                    border_radius=ft.border_radius.only(top_left=10, top_right=10),
+                ),
+                ft.Container(
+                    expand=True,
+                    width=400,
+                    padding=20,
+                    content=ft.Column(
+                        controls=[
+                            # CAIXAS DA PESQUISA AQUI
+                            ft.TextField(label="Produto", width=300, height=30),
+                            cls.create_panel_search()
+                        ],
+                        alignment=ft.MainAxisAlignment.CENTER,
+                        horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                    ),
+                )
+            ], tight=True),
+            border=ft.border.only(left=None),
+            border_radius=ft.border_radius.only(top_left=20, bottom_left=20),
+            padding=ft.padding.all(5),
+            margin=ft.margin.all(10),
+            width=370,
+            bgcolor=ft.colors.GREY_50,
+        )
+
+    @classmethod
+    def create_panel_search(cls):
+        category = cls.create_category_box()
+        brand = cls.create_brand_box()
+        price = cls.create_price_box()
+        return ft.ExpansionPanelList(
+            expand_icon_color=ft.colors.BLACK,
+            elevation=7,
+            divider_color=ft.colors.AMBER,
+            on_change=cls.handle_change,
+            expanded_header_padding=None,
+            controls=[
+                price,
+                category,
+                brand,
+            ],
+        )
+
+    @classmethod
+    def create_price_box(cls):
+        data_price = pd.DataFrame.from_dict(data=db_product)
+        # Min , max do que vem da base de dados
+        min_price = data_price['price'].min()
+        max_price = data_price['price'].max()
+        avg_price = data_price['price'].mean()
+
+        # calcula como tem que dividir por 5 com base do min, max
+        num_groups = round((max_price - min_price) // 5 + avg_price)
+        n_groups = int(num_groups)
+
+        # Create bins and labels
+        bins = [0, ]
+        for i in range(n_groups):
+            bins.append(min_price + avg_price * i)
+        labels = ['{:.2f}'.format(bins[i]) + '-' + '{:.2f}'.format(bins[i + 1]) for i in range(n_groups - 1)] + [
+            f'{bins[-1]}-{max_price}']
+        # Add a new column 'price_group' to DataFrame with bin labels
+        data_price['price_group'] = pd.cut(data_price['price'], bins=bins, labels=labels, right=False)
+
+        # Group by 'price_group' and count occurrences
+        grouped_counts = data_price.groupby('price_group').size().reset_index(name='count')
+        dict_count_by_price = grouped_counts.to_dict()
+        groups, counts = dict_count_by_price['price_group'].values(), dict_count_by_price['count'].values()
+
+        top_3_lines = [ft.Checkbox(label=f"{group} ({count})", label_style=ft.TextStyle(color=ft.colors.BLACK),
+                                   on_change=cls.checkbox_changed) for group, count in zip(groups, counts)]
+        top_3 = ft.ListView(auto_scroll=False, controls=top_3_lines)
+        exp = ft.ExpansionPanel(
+            bgcolor=ft.colors.GREY_50,
+            header=ft.ListTile(title=Row(
+                controls=[ft.Text(value="Preço", width=200, height=30,
+                                  color=ft.colors.BLACK, weight=ft.FontWeight.W_500),
+                          ft.IconButton(ft.icons.SEARCH_SHARP)],
+                width=100,
+            )),
+            content=ft.ListTile(
+                title=ft.Text("Entre:", color=ft.colors.BLACK),
+                subtitle=top_3,
+            ))
+        return exp
+
+    @classmethod
+    def create_category_box(cls):
+        data_category = pd.DataFrame.from_dict(data=db_product)
+        count_by_category = data_category.groupby('name_2')['name_2'].count().head(5)
+        dict_count_by_category = [count_by_category.to_dict()]
+        top_3_lines = []
+        for e in dict_count_by_category:
+            top_3_lines = [ft.Checkbox(label=f"{category} ({e[category]})",
+                                       label_style=ft.TextStyle(color=ft.colors.BLACK),
+                                       on_change=cls.checkbox_changed) for count, category in enumerate(e)]
+        top_3 = ft.ListView(auto_scroll=False, controls=top_3_lines)
+        exp = ft.ExpansionPanel(
+            bgcolor=ft.colors.GREY_50,
+            header=ft.ListTile(title=Row(
+                controls=[ft.TextField(label="Procure por Categoria", width=200, height=30),
+                          ft.IconButton(ft.icons.SEARCH_SHARP)],
+                width=100,
+            )),
+            content=ft.ListTile(
+                title=ft.Text("Top 5 Categorias", color=ft.colors.BLACK),
+                subtitle=top_3,
+            ))
+        return exp
+
+    @classmethod
+    def create_brand_box(cls):
+        data_brand = pd.DataFrame.from_dict(data=db_product)
+        count_by_brand = data_brand.groupby('name_1')['name_1'].count().head(5)
+        dict_count_by_brand = [count_by_brand.to_dict()]
+        top_3_lines = []
+        for e in dict_count_by_brand:
+            top_3_lines = [ft.Checkbox(label=f"{brand} ({e[brand]})",
+                                       label_style=ft.TextStyle(color=ft.colors.BLACK),
+                                       on_change=cls.checkbox_changed) for count, brand in enumerate(e)]
+        top_3 = ft.ListView(auto_scroll=False, controls=top_3_lines)
+        exp = ft.ExpansionPanel(
+            bgcolor=ft.colors.GREY_50,
+            header=ft.ListTile(title=Row(
+                controls=[ft.TextField(label="Procure por Marca", width=200, height=30),
+                          ft.IconButton(ft.icons.SEARCH_SHARP)],
+                width=100,
+            )),
+            content=ft.ListTile(
+                title=ft.Text("Top 5 marcas", color=ft.colors.BLACK),
+                subtitle=top_3,
+            ))
+        return exp
+
+    @classmethod
+    async def checkbox_changed(cls, e):
+        pass
+        # await t.update_async()
+
+    def handle_change(e: ft.ControlEvent):
+        pass
 
     @classmethod
     def create_page(cls, title: str, body: str):
@@ -112,9 +222,9 @@ class AppPages(UserControl):
         return Row(
             controls=[
                 Column(
-                    horizontal_alignment="stretch",
+                    horizontal_alignment=ft.CrossAxisAlignment.CENTER,
                     controls=[
-                        Card(content=Container(Text(title, weight="bold"), padding=8)),
+                        Card(content=Container(Text(title, weight=ft.FontWeight.BOLD), padding=8)),
                         Text(body),
                     ],
                     expand=True,

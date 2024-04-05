@@ -56,3 +56,12 @@ table_data = [{'bar_cod': '1', 'name': 'Alho francês', 'name_1': 'Propria', 'na
               {'bar_cod': '20', 'name': 'Maçã Fuji', 'name_1': 'Propria', 'name_2': 'Fruta', 'price': 1.5,
                'quantity': 1222.0,
                'description': 'Maçã Fuji', 'photo': 'maça_fuji.png', 'id': 2, 'id_1': 19}]
+
+brand_list = ['Marca Própria', 'Milaneza', 'Barilla', 'Nacional', 'Cigala', 'Garofalo', 'Bom Petisco', 'Baci',
+              'Starbucks', 'Kinder', 'Tritão', 'Compal', 'Fula', 'Lays', 'Sidul', 'Nobre', 'Gallo',
+              'Oliveira da Serra']
+
+category_list = ['Vegetais', 'Fruta', 'Talho', 'Peixaria', 'Padaria e Pastelaria', 'Charcutaria',
+                 'Higiene e Beleza', 'Especiarias', 'Congelados', 'Limpeza', 'Bebé', 'Livraria e Papelaria',
+                 'Casa, Bricolage e Jardim', 'Bebidas e Garrafeira', 'Lacticínios e Ovos',
+                 'Bio e Intolerâncias', 'Mercearia']

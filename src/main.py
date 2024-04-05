@@ -1,7 +1,7 @@
 import flet
 import flet as ft
 from flet import Container, padding, Page, margin
-from App.app_layout import AppLayout
+from App.app_window import AppWindow
 
 
 class App(ft.UserControl):
@@ -14,7 +14,7 @@ class App(ft.UserControl):
             padding=padding.all(0),
             margin=margin.all(0),
             alignment=ft.alignment.center,
-            content=AppLayout(self, page)
+            content=AppWindow(self, page)
         )
         self.page.add(self.app_view)
         self.page.update()
