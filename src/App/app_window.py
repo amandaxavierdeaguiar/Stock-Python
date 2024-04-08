@@ -1,5 +1,5 @@
 import flet as ft
-from flet import Row, Column, Control, Text, IconButton, icons, colors
+from flet import Row, View, Container, padding, margin
 
 from App.app_header import AppHeader
 from App.app_layout import AppLayout

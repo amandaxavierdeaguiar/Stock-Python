@@ -104,7 +104,7 @@ class AppPages(UserControl):
             elevation=7,
             divider_color=ft.colors.AMBER,
             on_change=cls.handle_change,
-            expanded_header_padding=None,
+            expanded_header_padding=15,
             controls=[
                 price,
                 category,
@@ -134,7 +134,7 @@ class AppPages(UserControl):
         data_price['price_group'] = pd.cut(data_price['price'], bins=bins, labels=labels, right=False)
 
         # Group by 'price_group' and count occurrences
-        grouped_counts = data_price.groupby('price_group').size().reset_index(name='count')
+        grouped_counts = data_price.groupby('price_group', observed=True).size().reset_index(name='count')
         dict_count_by_price = grouped_counts.to_dict()
         groups, counts = dict_count_by_price['price_group'].values(), dict_count_by_price['count'].values()
 
@@ -144,14 +144,15 @@ class AppPages(UserControl):
         exp = ft.ExpansionPanel(
             bgcolor=ft.colors.GREY_50,
             header=ft.ListTile(title=Row(
-                controls=[ft.Text(value="Preço", width=200, height=30,
-                                  color=ft.colors.BLACK, weight=ft.FontWeight.W_500),
+                controls=[ft.Text(value="Preço", width=210, height=30,
+                                  color=ft.colors.BLACK, weight=ft.FontWeight.W_500, text_align=ft.TextAlign.CENTER),
                           ft.IconButton(ft.icons.SEARCH_SHARP)],
                 width=100,
+                spacing=0,
             )),
             content=ft.ListTile(
-                title=ft.Text("Entre:", color=ft.colors.BLACK),
-                subtitle=top_3,
+                    title=ft.Text("Entre:", color=ft.colors.BLACK),
+                    subtitle=top_3,
             ))
         return exp
 
@@ -171,6 +172,7 @@ class AppPages(UserControl):
             header=ft.ListTile(title=Row(
                 controls=[ft.TextField(label="Procure por Categoria", width=200, height=30),
                           ft.IconButton(ft.icons.SEARCH_SHARP)],
+                alignment=ft.MainAxisAlignment.CENTER,
                 width=100,
             )),
             content=ft.ListTile(
