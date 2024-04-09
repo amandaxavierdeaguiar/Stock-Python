@@ -1,9 +1,8 @@
 import flet as ft
-from flet import Text, Column, Card, Row, Container, UserControl, ExpansionPanelList
+from flet import Text, Column, Card, Row, Container, UserControl
 
-from App.app_table import AppTable
-from App.app_menu import AppMenu
-from Views.Product.ListProduct import table_data as db_product, category_list, brand_list
+from App.features.app_table import AppTable
+from Views.Product.ListProduct import table_data as db_product
 from Views.Supplier.ListSupplier import table_data as db_supplier
 from Views.User.ListUser import table_data as db_user
 import pandas as pd
@@ -49,7 +48,7 @@ class AppPages(UserControl):
             content=list_view,
             adaptive=True,
         )
-        return content, list_view
+        return content
 
     @classmethod
     def create_search(cls):

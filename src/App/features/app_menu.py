@@ -30,23 +30,33 @@ class AppMenu(UserControl):
         )
 
     @classmethod
-    def create_menu_btn(cls, label_, icon_):
+    def create_menu_btn(cls, label_, icon_, type_=None):
         return NavigationRailDestination(
-            label_content=Text(label_, color=ft.colors.BLACK),
-            label=label_,
-            icon=icon_,
-            selected_icon=icon_,
+                label_content=Text(label_, color=ft.colors.BLACK),
+                label=label_,
+                icon=icon_,
+                selected_icon=icon_,
         )
 
     @classmethod
-    def build_navigation_rail(cls, var_on_change):
-        return NavigationRail(
-            selected_index=0,
-            label_type=ft.NavigationRailLabelType.ALL,
-            on_change=var_on_change,
-            bgcolor=colors.LIGHT_BLUE_ACCENT_700,
-            expand=True,
-        )
+    def build_navigation_rail(cls, var_on_change, type_=None):
+        if type_ == 'login':
+            return NavigationRail(
+                selected_index=0,
+                label_type=ft.NavigationRailLabelType.ALL,
+                on_change=var_on_change,
+                bgcolor=colors.LIGHT_BLUE_ACCENT_700,
+                expand=True,
+                visible=False,
+            )
+        else:
+            return NavigationRail(
+                selected_index=0,
+                label_type=ft.NavigationRailLabelType.ALL,
+                on_change=var_on_change,
+                bgcolor=colors.LIGHT_BLUE_ACCENT_700,
+                expand=True,
+            )
 
     def update_destinations(self):
         pass

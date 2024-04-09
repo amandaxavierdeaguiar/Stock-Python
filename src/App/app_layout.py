@@ -1,9 +1,9 @@
 import flet as ft
-from flet import Text, Column, Card, Row, Container, UserControl, icons, Control, IconButton, colors
+from flet import Text, Column, UserControl, icons, Control, IconButton, colors
 
 from App.app_pages import AppPages
-from App.app_table import AppTable
-from App.app_menu import AppMenu
+from App.features.app_menu import AppMenu
+from App.app_auth import AppAuth
 from Views.Product.ListProduct import table_data as db_product
 from Views.Supplier.ListSupplier import table_data as db_supplier
 from Views.User.ListUser import table_data as db_user
@@ -20,10 +20,11 @@ class AppLayout(UserControl):
 
     """
     def __init__(self, page: ft.Page, *args, **kwargs):
-        super().__init__()
+        super().__init__(*args, **kwargs)
         self.page = page
         self.app_menu = AppMenu(self.page)
         self.app_pages = AppPages(self.page)
+
         pages = [
             (
                 self.app_menu.create_menu_btn(label_='Stock', icon_=icons.WAREHOUSE_OUTLINED),
@@ -34,10 +35,11 @@ class AppLayout(UserControl):
                 self.app_pages.create_content(1),
             ),
             (
-                self.app_menu.create_menu_btn(label_='Use', icon_=icons.PERSON),
+                self.app_menu.create_menu_btn(label_='User', icon_=icons.PERSON),
                 self.app_pages.create_content(2),
             ),
         ]
+
         self.navigation_items = [navigation_item for navigation_item, _ in pages]
         self.navigation_rail = self.app_menu.build_navigation_rail(self._navigation_change)
         self.update_destinations()
@@ -47,7 +49,7 @@ class AppLayout(UserControl):
         self.menu_panel = self.app_menu.get_menu(self.navigation_rail)
         self.search_panel = self.app_pages.create_search()
 
-        page_contents = [page_content for _, [page_content, list_view] in pages]
+        page_contents = [page_content for _, page_content in pages]
         self.content_area = Column(controls=page_contents, expand=True)
 
         self.toggle_menu_panel = IconButton(

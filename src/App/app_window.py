@@ -1,7 +1,7 @@
-import flet as ft
-from flet import Row, View, Container, padding, margin
+from flet import Row
 
-from App.app_header import AppHeader
+from App.app_auth import AppAuth
+from App.features.app_header import AppHeader
 from App.app_layout import AppLayout
 from Views.Product.ListProduct import table_data as db_product
 from Views.Supplier.ListSupplier import table_data as db_supplier
@@ -20,7 +20,7 @@ class AppWindow(Row):
     def __init__(self, title, page, *args, window_size=(800, 600), **kwargs):
         super().__init__(*args, **kwargs)
         self.page = page
-
+        self.is_login = False
         self.expand = True
 
         self.page.on_resize = self.handle_resize
@@ -31,8 +31,12 @@ class AppWindow(Row):
         self.appbar = AppHeader(page)
         self.page.appbar = self.appbar.get_app_bar()
 
-        self.app_page = AppLayout(page=self.page)
-        self.controls = self.app_page.set_content(self._panel_visible)
+        if self.is_login:
+            self.app_page = AppLayout(page=self.page)
+            self.controls = self.app_page.set_content(self._panel_visible)
+        else:
+            self.app_page = AppAuth(page=self.page)
+            self.controls = self.app_page.set_content()
 
         self.window_size = window_size
         self.page.window_width, self.page.window_height = self.window_size

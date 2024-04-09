@@ -1,9 +1,12 @@
 import flet as ft
 import base64
-from flet import Text, Column, colors, icons, IconButton, Control, Row, Container, Image, ImageFit
+from flet import colors, icons, IconButton
+from Views.Product.ListProduct import brand_list as db_brands
+from Views.Product.ListProduct import category_list as db_category
+from Views.Product.ListProduct import table_data as db_products
 
 
-class ProductNew():
+class ProductNew:
     def close_img(self, e):
         self.img_Container.visible = not self.img_Container.visible
         self.btn_close_img.visible = not self.btn_close_img.visible
@@ -20,13 +23,10 @@ class ProductNew():
         self.title_product = ft.Text("Insira o produto", size=30, color=colors.BLUE_900)  # ADD
         # Pedindo para inserir os dados:
         self.txt_name_product = ft.TextField(label="Nome do Produto", width=300)
-        self.txt_price = ft.TextField(label="Valor do produto", width=300)  # ver como fica para ser float
+        self.txt_price = ft.TextField(label="Valor do produto", width=300, )  # ver como fica para ser float
 
         # Criando uma lista para o box da Categoria
-        category_list = ['Vegetais', 'Fruta', 'Talho', 'Peixaria', 'Padaria e Pastelaria', 'Charcutaria',
-                         'Higiene e Beleza', 'Especiarias', 'Congelados', 'Limpeza', 'Bebé', 'Livraria e Papelaria',
-                         'Casa, Bricolage e Jardim', 'Bebidas e Garrafeira', 'Lacticínios e Ovos',
-                         'Bio e Intolerâncias', 'Mercearia']
+        category_list = db_category
 
         # Puxando cada item da lista Categoria
         self.c = ft.Dropdown(label="Categoria", width=300)
@@ -34,9 +34,7 @@ class ProductNew():
             self.c.options.append(ft.dropdown.Option(category))
 
         # Criando a lista Marca
-        brand_list = ['Marca Própria', 'Milaneza', 'Barilla', 'Nacional', 'Cigala', 'Garofalo', 'Bom Petisco', 'Baci',
-                      'Starbucks', 'Kinder', 'Tritão', 'Compal', 'Fula', 'Lays', 'Sidul', 'Nobre', 'Gallo',
-                      'Oliveira da Serra']
+        brand_list = db_brands
 
         # Puxando cada item da lista Marca
         self.b = ft.Dropdown(label="Marca", width=300)

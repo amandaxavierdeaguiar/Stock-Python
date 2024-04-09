@@ -1,17 +1,21 @@
 import flet as ft
 import hashlib
+import re
+import pandas as pd
+from Views.User.ListUser import table_data as db_user
 
 
-class LoginRegister:
-    def __init__(self, page: ft.Page):
+class Login:
 
+    def __init__(self, page: ft.Page, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         page.title = 'Cadastro'
         page.vertical_alignment = ft.MainAxisAlignment.CENTER
         page.horizontal_alignment = ft.CrossAxisAlignment.CENTER
         page.bgcolor = ft.colors.BLUE_100
 
         image = ft.Image(src="icons/login.png", width=150, height=150)
-        txt_username = ft.TextField(label="Digite seu Login", width=300, prefix_icon=ft.icons.EMAIL)
+        txt_username = ft.TextField(label="Digite seu email", width=300, prefix_icon=ft.icons.EMAIL)
         txt_password = ft.TextField(label="Digite sua Password", width=300, password=True, can_reveal_password=True,
                                     prefix_icon=ft.icons.LOCK)
 
@@ -23,7 +27,7 @@ class LoginRegister:
         button_submit: ft.ElevatedButton = ft.ElevatedButton(
             text='Entre',
             width=140,
-            disabled=True
+            disabled=True,
         )
 
         button_register: ft.ElevatedButton = ft.ElevatedButton(
@@ -51,6 +55,8 @@ class LoginRegister:
             text='Cadastro',
             width=140,
         )
+
+        self.table_data = pd.DataFrame(columns=['name', "login", 'password', 'type_acess'])
 
         def validate(e: ft.ControlEvent) -> None:
             if all([txt_username.value, txt_password.value, checkbox_signup.value]):
@@ -94,12 +100,71 @@ class LoginRegister:
                 )
             )
 
+        def login_alert(e: ft.ControlEvent):
+            user = next((item for item in db_user if item['login'] == txt_username.value), None)
+
+            if user is None:
+                dlg = ft.AlertDialog(
+                    title=ft.Text("Email Inválido"),
+                    content=ft.Text("Digite novamente os dados!"),
+                )
+                page.dialog = dlg
+                dlg.open = True
+                page.update()
+            else:
+                print(f'Inseriu para o Banco de Dados.')
+
+        def show_password_alert(e: ft.ControlEvent):
+            if create_password.value != check_password.value:
+                dlg = ft.AlertDialog(
+                    title=ft.Text("As senhas não coincidem!"),
+                    content=ft.Text("Verifique as informações fornecidas."),
+                )
+                page.dialog = dlg
+                dlg.open = True
+                page.update()
+
+            elif not validate_password(create_password.value):
+                alert = ft.AlertDialog(
+                    title=ft.Text("Senha Inválida"),
+                    content=ft.Text(
+                        "A senha deve conter pelo menos 1 maiuscula, 1 caractere especial e ter no mínimo 8 caracteres!"),
+                )
+                page.dialog = alert
+                alert.open = True
+                page.update()
+
+            else:
+                new_data = {
+                    'name': create_user.value,
+                    'login': create_login.value,
+                    'password': hashlib.sha256(create_password.value.encode()).hexdigest(),
+                    'type_acess': create_type_acess.value
+                }
+                new_row = pd.DataFrame([new_data], columns=['name', "login", 'password', 'type_acess'])
+                db_user_pd = pd.concat([db_user, new_row], ignore_index=True)
+
+                # Clear form fields
+                create_user.value = ''
+                create_login.value = ''
+                create_password.value = ''
+                check_password.value = ''
+                create_type_acess.value = None
+
+                dlg = ft.AlertDialog(
+                    title=ft.Text("Cadastro realizado com sucesso!"),
+                    content=ft.Text("Você já pode fazer o login!"),
+                )
+                page.dialog = dlg
+                dlg.open = True
+                page.update()
+
         txt_username.on_change = validate
         txt_password.on_change = validate
         checkbox_signup.on_change = validate
-        button_submit.on_click = submit
+        button_submit.on_click = login_alert
         button_register.on_click = register
-        # button_register_user.on_click = show_password_alert
+        button_register_user.on_click = show_password_alert
 
         page.add(
             ft.Container(
@@ -131,19 +196,15 @@ class LoginRegister:
             )
         )
 
-        """def show_password_alert(page,e: ft.ControlEvent) -> None:
-            if create_password.value != check_password.value:
-                dlg = ft.AlertDialog(
-                    title=ft.Text("As senhas não coincidem"),
-                    on_dismiss=lambda e: print("Dialog dismissed!")
-                )   
-                page.dialog = dlg
-                dlg.open = True
-                page.update()
-            else:
-                dlg.open = False
-                page.update()"""
+
+def validate_password(password):
+    pattern = r'^(?=.*[A-Z])(?=.*\d)(?=.*[!@+$%&#/€?*.-])[a-zA-Z\d!@+$%&#/€?*.-]{8,16}$'
+
+    if re.match(pattern, password):
+        return True
+    else:
+        return False
 
 
 if __name__ == '__main__':
-    ft.app(target=LoginRegister, assets_dir="./assets")
+    ft.app(target=Login, assets_dir="../assets")
