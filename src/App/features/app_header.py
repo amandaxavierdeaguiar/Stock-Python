@@ -1,20 +1,31 @@
 import flet as ft
-from flet import (Container, UserControl, Text, AppBar, PopupMenuButton, PopupMenuItem, colors, margin)
+from flet import (Container, UserControl, Text, AppBar, PopupMenuButton,
+                  PopupMenuItem, colors, margin, NavigationRail, NavigationRailDestination)
 
 
 class AppHeader(UserControl):
     """
 
     """
-    def __init__(self, page):
+
+    def __init__(self, page, user, var_on_click):
         super().__init__()
+        self.page = page
+        self.user = user
+
         self.appbar_items = [
-            PopupMenuItem(text="Login"),
+            PopupMenuItem(text="Login" if self.user.login is None else f'{self.user.login}', on_click=var_on_click, data='login'),
             PopupMenuItem(),  # divider
-            PopupMenuItem(text="Settings")
+            PopupMenuItem(text="Logout", data='logout', on_click=self.logout,
+                          disabled=False if self.user.is_login else True)
         ]
         self.appbar_logo = ft.Image(src="icons/logo-stock.png",
                                     width=30, height=30, fit=ft.ImageFit.CONTAIN, tooltip="Logo")
+        self.app_bar = self.get_app_bar()
+
+    def change_btn_logout(self):
+        self.appbar_items[0].text = self.user.login
+        self.appbar_items[2].disabled = not self.appbar_items[2].disabled
 
     def get_app_bar(self):
         """
@@ -30,6 +41,7 @@ class AppHeader(UserControl):
             bgcolor=colors.LIGHT_BLUE_ACCENT_700,
             actions=[
                 Container(
+                    padding=0,
                     content=PopupMenuButton(
                         items=self.appbar_items
                     ),
@@ -38,3 +50,5 @@ class AppHeader(UserControl):
             ],
         )
 
+    def logout(self, event):
+        self.page.logout()

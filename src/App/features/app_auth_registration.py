@@ -1,26 +1,55 @@
 import flet as ft
 import hashlib
+import os
 import re
 from flet import Text, Column, UserControl, icons, Control, IconButton, colors
+import pandas as pd
 
 from flet_core import Container
-
+from Models.UserAuthentication import UserAuthentication
 from Views.User.ListUser import table_data as db_user
 
 
 class AuthRegister(UserControl):
-    def __init__(self, page, *args, **kwargs):
+    def __init__(self, page, var, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.page = page
+        self.auth = UserAuthentication()
 
-        self.create_user = ft.TextField(label="Digite o Nome:", width=300, prefix_icon=ft.icons.PERSON)
-        self.create_login = ft.TextField(label="Digite o Login:", width=300, prefix_icon=ft.icons.EMAIL)
-        self.create_password = ft.TextField(label="Digite a Password:", width=300, password=True,
-                                            can_reveal_password=True, prefix_icon=ft.icons.LOCK)
-        self.check_password = ft.TextField(label="Repita a Password:", width=300, password=True,
-                                           can_reveal_password=True, prefix_icon=ft.icons.LOCK)
+        self._input_name = self.name()
+        self._input_login = self.login()
+        self._input_password = self.password()
+        self._check_password = self.check_password()
+        self._type_access = self.type_access()
+        self.button_submit_register: ft.ElevatedButton = self.button_submit_signup(
+            data="signup_submit", var_on_change=var, var_alert=self.show_password_alert)
+        self.button_cancel: ft.ElevatedButton = self.create_button_cancel(
+            data="signup_submit", var_on_change=var)
+        self.content = self.create_register(self._input_name, self._input_login,
+                                            self._input_password, self._check_password, self._type_access,
+                                            self.button_submit_register, self.button_cancel)
 
-        self.create_type_acess = ft.Dropdown(
+    @classmethod
+    def name(cls):
+        return ft.TextField(label="Digite o Nome:", width=300, prefix_icon=ft.icons.PERSON)
+
+    @classmethod
+    def login(cls):
+        return ft.TextField(label="Digite o Login:", width=300, prefix_icon=ft.icons.EMAIL)
+
+    @classmethod
+    def password(cls):
+        return ft.TextField(label="Digite a Password:", width=300, password=True,
+                            can_reveal_password=True, prefix_icon=ft.icons.LOCK)
+
+    @classmethod
+    def check_password(cls):
+        return ft.TextField(label="Repita a Password:", width=300, password=True,
+                            can_reveal_password=True, prefix_icon=ft.icons.LOCK)
+
+    @classmethod
+    def type_access(cls):
+        return ft.Dropdown(
             options=[
                 ft.dropdown.Option("Admin"),
                 ft.dropdown.Option("Sub_Admin"),
@@ -29,11 +58,17 @@ class AuthRegister(UserControl):
             width=300,
         )
 
-        self.button_register_user: ft.ElevatedButton = ft.ElevatedButton(text='Cadastro', width=140, )
+    @classmethod
+    def button_submit_signup(cls, data, var_on_change=None, var_alert=None):
+        return ft.ElevatedButton(text='Cadastro', width=140, on_click=var_alert,
+                                 data=data, on_animation_end=var_on_change)
 
-        self.button_register_user.on_click = self.show_password_alert
+    @classmethod
+    def create_button_cancel(cls, data, var_on_change=None):
+        return ft.ElevatedButton(text='Voltar', width=140, on_click=var_on_change, data=data)
 
-    def create_register(self) -> Container:
+    @classmethod
+    def create_register(cls, name, login, password, check_password, type_access, signup, cancel) -> Container:
         return ft.Container(
             width=400,
             height=450,
@@ -43,62 +78,72 @@ class AuthRegister(UserControl):
             content=ft.Column(
                 controls=[ft.Column(
                     controls=[
-                        self.create_user,
-                        self.create_login,
-                        self.create_password,
-                        self.check_password,
-                        self.create_type_acess,
-                        self.button_register_user,
+                        name,
+                        login,
+                        password,
+                        check_password,
+                        type_access,
                     ],
                     alignment=ft.MainAxisAlignment.CENTER,
                     horizontal_alignment=ft.CrossAxisAlignment.CENTER,
                 ),
+                    ft.Row(controls=[
+                        cancel,
+                        signup,
+                    ],
+                        alignment=ft.MainAxisAlignment.CENTER,
+                        spacing=20,
+                    )
                 ],
             )
         )
 
-    @classmethod
-    def show_password_alert(cls):
-        if cls.create_password.value != cls.check_password.value:
+    def show_password_alert(self):
+        if self._input_password.value != self._check_password.value:
             dlg = ft.AlertDialog(
                 title=ft.Text("As senhas não coincidem!"),
                 content=ft.Text("Verifique as informações fornecidas."),
             )
-            cls.page.dialog = dlg
+            self.page.dialog = dlg
             dlg.open = True
-            cls.page.update()
+            self.page.update()
 
-        elif not validate_password(cls.create_password.value):
+        elif not self.auth.validate_password(self._input_password.value):
             alert = ft.AlertDialog(
                 title=ft.Text("Senha Inválida"),
                 content=ft.Text(
                     "A senha deve conter pelo menos 1 maiuscula, 1 caractere especial e ter no mínimo 8 caracteres!"),
             )
-            cls.page.dialog = alert
+            self.page.dialog = alert
             alert.open = True
-            cls.page.update()
+            self.page.update()
 
         else:
+            salt = os.urandom(16)
+            salt_hex = salt.hex()
+            password_hash = hashlib.pbkdf2_hmac(
+                'sha256', self._input_password.value.encode('UTF-8'), salt, 100000)
+            password_hash_hex = password_hash.hex()
             new_data = {
-                'name': cls.create_user.value,
-                'login': cls.create_login.value,
-                'password': hashlib.sha256(cls.create_password.value.encode()).hexdigest(),
-                'type_acess': cls.create_type_acess.value
+                'name': self._input_name.value,
+                'login': self._input_login.value,
+                'password': password_hash_hex,
+                'type_access': self._type_access.value
             }
             new_row = pd.DataFrame([new_data], columns=['name', "login", 'password', 'type_acess'])
-            cls.table_data = pd.concat([cls.table_data, new_row], ignore_index=True)
+            db_user_pd = pd.concat([db_user, new_row], ignore_index=True)
 
             # Clear form fields
-            cls.create_user.value = ''
-            cls.create_login.value = ''
-            cls.create_password.value = ''
-            cls.check_password.value = ''
-            cls.create_type_acess.value = None
+            self._input_name.value = ''
+            self._input_login.value = ''
+            self._input_password.value = ''
+            self._check_password.value = ''
+            self._type_access.value = None
 
             dlg = ft.AlertDialog(
                 title=ft.Text("Cadastro realizado com sucesso!"),
                 content=ft.Text("Você já pode fazer o login!"),
             )
-            cls.page.dialog = dlg
+            self.page.dialog = dlg
             dlg.open = True
-            cls.page.update()
+            self.page.update()
