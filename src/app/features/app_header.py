@@ -1,18 +1,18 @@
 import flet as ft
 from flet import (Container, UserControl, Text, AppBar, PopupMenuButton,
-                  PopupMenuItem, colors, margin, NavigationRail, NavigationRailDestination)
+                  PopupMenuItem, colors, margin)
+
+from shared.Base.SharedControls import SharedControls
 
 
-class AppHeader(UserControl):
+class AppHeader(SharedControls):
     """
 
     """
 
-    def __init__(self, page, user, var_on_click):
+    def __init__(self, page, var_on_click):
         super().__init__()
         self.page = page
-        self.user = user
-
         self.appbar_items = [
             PopupMenuItem(text="Login" if self.user.login is None else f'{self.user.login}', on_click=var_on_click, data='login'),
             PopupMenuItem(),  # divider
@@ -24,7 +24,7 @@ class AppHeader(UserControl):
         self.app_bar = self.get_app_bar()
 
     def change_btn_logout(self):
-        self.appbar_items[0].text = self.user.login
+        self.appbar_items[0] = self.user.login
         self.appbar_items[2].disabled = not self.appbar_items[2].disabled
 
     def get_app_bar(self):
@@ -35,7 +35,7 @@ class AppHeader(UserControl):
         return AppBar(
             leading=self.appbar_logo,
             leading_width=50,
-            title=Text("Stock Management", size=30, text_align=ft.TextAlign.CENTER),
+            title=Text("stock Management", size=30, text_align=ft.TextAlign.CENTER),
             center_title=False,
             toolbar_height=65,
             bgcolor=colors.LIGHT_BLUE_ACCENT_700,

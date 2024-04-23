@@ -1,38 +1,37 @@
 import flet as ft
-from flet import Text, Column, Card, Row, Container, UserControl
-
-from App.features.app_table import AppTable
-from Views.Product.ListProduct import table_data as db_product
-from Views.Supplier.ListSupplier import table_data as db_supplier
-from Views.User.ListUser import table_data as db_user
 import pandas as pd
+from flet import Text, Column, Card, Row, Container, UserControl
+from sqlalchemy.orm import Session
 
-list_tables = {
-    0: db_product,
-    1: db_supplier,
-    2: db_user,
-}
+from app.features.app_table import AppTable
+from controllers.StockController import StockController
+from views.Product.ProductView import ProductView
+from models.user.auth.UserAuthentication import UserAuthentication
+from shared.Base.SharedControls import SharedControls
 
 
-class AppPages(UserControl):
+class AppPages(SharedControls):
     """
 
     """
+    ctrl_stock: StockController = StockController()
+    product_view: ProductView = ProductView()
 
     def __init__(self, page: ft.Page, *args, **kwargs):
-        super().__init__()
-        self.page = page
+        super().__init__(page, *args, **kwargs)
 
     @classmethod
     def create_content(cls, view=0):
         """
 
+        :param user:
         :param view:
         :return:
         """
+        base = cls.ctrl_stock.get_all(cls.user)
         list_view = ft.ListView(
             controls=[
-                AppTable.get_table(list_tables[view]),
+                AppTable.get_table(base.entity['entity_']),
             ],
             spacing=10,
             padding=10,
@@ -113,29 +112,7 @@ class AppPages(UserControl):
 
     @classmethod
     def create_price_box(cls):
-        data_price = pd.DataFrame.from_dict(data=db_product)
-        # Min , max do que vem da base de dados
-        min_price = data_price['price'].min()
-        max_price = data_price['price'].max()
-        avg_price = data_price['price'].mean()
-
-        # calcula como tem que dividir por 5 com base do min, max
-        num_groups = round((max_price - min_price) // 5 + avg_price)
-        n_groups = int(num_groups)
-
-        # Create bins and labels
-        bins = [0, ]
-        for i in range(n_groups):
-            bins.append(min_price + avg_price * i)
-        labels = ['{:.2f}'.format(bins[i]) + '-' + '{:.2f}'.format(bins[i + 1]) for i in range(n_groups - 1)] + [
-            f'{bins[-1]}-{max_price}']
-        # Add a new column 'price_group' to DataFrame with bin labels
-        data_price['price_group'] = pd.cut(data_price['price'], bins=bins, labels=labels, right=False)
-
-        # Group by 'price_group' and count occurrences
-        grouped_counts = data_price.groupby('price_group', observed=True).size().reset_index(name='count')
-        dict_count_by_price = grouped_counts.to_dict()
-        groups, counts = dict_count_by_price['price_group'].values(), dict_count_by_price['count'].values()
+        groups, counts = cls.product_view.get_all_prices()
 
         top_3_lines = [ft.Checkbox(label=f"{group} ({count})", label_style=ft.TextStyle(color=ft.colors.BLACK),
                                    on_change=cls.checkbox_changed) for group, count in zip(groups, counts)]
@@ -150,16 +127,14 @@ class AppPages(UserControl):
                 spacing=0,
             )),
             content=ft.ListTile(
-                    title=ft.Text("Entre:", color=ft.colors.BLACK),
-                    subtitle=top_3,
+                title=ft.Text("Entre:", color=ft.colors.BLACK),
+                subtitle=top_3,
             ))
         return exp
 
     @classmethod
     def create_category_box(cls):
-        data_category = pd.DataFrame.from_dict(data=db_product)
-        count_by_category = data_category.groupby('name_2')['name_2'].count().head(5)
-        dict_count_by_category = [count_by_category.to_dict()]
+        dict_count_by_category = cls.product_view.get_all_categories()
         top_3_lines = []
         for e in dict_count_by_category:
             top_3_lines = [ft.Checkbox(label=f"{category} ({e[category]})",
@@ -182,9 +157,7 @@ class AppPages(UserControl):
 
     @classmethod
     def create_brand_box(cls):
-        data_brand = pd.DataFrame.from_dict(data=db_product)
-        count_by_brand = data_brand.groupby('name_1')['name_1'].count().head(5)
-        dict_count_by_brand = [count_by_brand.to_dict()]
+        dict_count_by_brand = cls.product_view.get_all_brands()
         top_3_lines = []
         for e in dict_count_by_brand:
             top_3_lines = [ft.Checkbox(label=f"{brand} ({e[brand]})",

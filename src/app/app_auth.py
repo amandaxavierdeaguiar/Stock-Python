@@ -1,19 +1,17 @@
 import flet as ft
-from flet import Text, Column, UserControl, icons, Control, IconButton, colors
+from flet import Text, Column, UserControl, Control
+from shared.Base.SharedControls import SharedControls
 
-from flet_core import Container
-
-from App.features.app_auth_login import AuthLogin
-from App.features.app_auth_registration import AuthRegister
-from Views.User.ListUser import table_data as db_user
+from app.features.app_auth_login import AuthLogin
+from app.features.app_auth_registration import AuthRegister
 
 
-class AppAuth(UserControl):
-    def __init__(self, user, page: ft.Page, *args, **kwargs):
+class AppAuth(SharedControls):
+    def __init__(self,page, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.page = page
-        self.auth_login = AuthLogin(user=user, page=self.page, select_page=self.select_page)
-        self.auth_register = AuthRegister(self.page, self.select_page)
+        self.auth_login = AuthLogin(self.page, select_page=self.select_page)
+        self.auth_register = AuthRegister(self.select_page)
         self.default_page = 0
         self.btn_login_signup = self.auth_login.button_signup
         self.btn_signup_submit = self.auth_register.button_cancel

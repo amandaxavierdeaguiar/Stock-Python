@@ -1,42 +1,33 @@
 import flet as ft
 from flet import Text, Column, UserControl, icons, Control, IconButton, colors
 
-from App.app_pages import AppPages
-from App.features.app_menu import AppMenu
-from App.app_auth import AppAuth
-from Views.Product.ListProduct import table_data as db_product
-from Views.Supplier.ListSupplier import table_data as db_supplier
-from Views.User.ListUser import table_data as db_user
-
-list_tables = {
-    0: db_product,
-    1: db_supplier,
-    2: db_user,
-}
+from app.app_pages import AppPages
+from app.features.app_menu import AppMenu
+from models.user.auth.UserAuthentication import UserAuthentication
+from shared.Base.SharedControls import SharedControls
 
 
-class AppLayout(UserControl):
+class AppLayout(SharedControls):
     """
 
     """
-    def __init__(self, page: ft.Page, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.page = page
         self.app_menu = AppMenu(self.page)
-        self.app_pages = AppPages(self.page)
+        self.app_pages = AppPages(self.page, self.user)
 
         pages = [
             (
-                self.app_menu.create_menu_btn(label_='Stock', icon_=icons.WAREHOUSE_OUTLINED),
-                self.app_pages.create_content(0),
+                self.app_menu.create_menu_btn(label_='stock', icon_=icons.WAREHOUSE_OUTLINED),
+                self.app_pages.create_content(view=0),
             ),
             (
-                self.app_menu.create_menu_btn(label_='Supplier', icon_=icons.PERSON_2),
-                self.app_pages.create_content(1),
+                self.app_menu.create_menu_btn(label_='supplier', icon_=icons.PERSON_2),
+                self.app_pages.create_content(view=1),
             ),
             (
                 self.app_menu.create_menu_btn(label_='User', icon_=icons.PERSON),
-                self.app_pages.create_content(2),
+                self.app_pages.create_content(view=2),
             ),
         ]
 

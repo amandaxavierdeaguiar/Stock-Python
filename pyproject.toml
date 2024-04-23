@@ -10,6 +10,7 @@ readme = "README.md"
 python = "^3.12"
 flet = "^0.21.2"
 psycopg2 = "^2.9.9"
+bcrypt = "^4.1.2"
 
 
 [build-system]

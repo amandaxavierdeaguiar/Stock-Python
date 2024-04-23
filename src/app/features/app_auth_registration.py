@@ -1,21 +1,16 @@
-import flet as ft
 import hashlib
 import os
-import re
-from flet import Text, Column, UserControl, icons, Control, IconButton, colors
+
+import flet as ft
 import pandas as pd
-
+from flet import UserControl
 from flet_core import Container
-from Models.UserAuthentication import UserAuthentication
-from Views.User.ListUser import table_data as db_user
+from shared.Base.SharedControls import SharedControls
 
 
-class AuthRegister(UserControl):
-    def __init__(self, page, var, *args, **kwargs):
+class AuthRegister(SharedControls):
+    def __init__(self, var, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.page = page
-        self.auth = UserAuthentication()
-
         self._input_name = self.name()
         self._input_login = self.login()
         self._input_password = self.password()
@@ -108,7 +103,7 @@ class AuthRegister(UserControl):
             dlg.open = True
             self.page.update()
 
-        elif not self.auth.validate_password(self._input_password.value):
+        elif not self.user.validate_password(self._input_password.value):
             alert = ft.AlertDialog(
                 title=ft.Text("Senha Inválida"),
                 content=ft.Text(
@@ -131,7 +126,7 @@ class AuthRegister(UserControl):
                 'type_access': self._type_access.value
             }
             new_row = pd.DataFrame([new_data], columns=['name', "login", 'password', 'type_acess'])
-            db_user_pd = pd.concat([db_user, new_row], ignore_index=True)
+            # db_user_pd = pd.concat([db_user, new_row], ignore_index=True)
 
             # Clear form fields
             self._input_name.value = ''

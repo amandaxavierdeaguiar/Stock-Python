@@ -1,30 +1,21 @@
 import flet as ft
-from flet import Row, Container, Column, UserControl
+from flet import Container, Column, UserControl
 
-from App.app_auth import AppAuth
-from App.features.app_header import AppHeader
-from App.app_layout import AppLayout
-from Models.UserAuthentication import UserAuthentication
-from Views.Product.ListProduct import table_data as db_product
-from Views.Supplier.ListSupplier import table_data as db_supplier
-from Views.User.ListUser import table_data as db_user
-
-list_tables = {
-    0: db_product,
-    1: db_supplier,
-    2: db_user,
-}
+from app.app_auth import AppAuth
+from app.app_layout import AppLayout
+from app.features.app_header import AppHeader
+from models.user.auth.UserAuthentication import UserAuthentication
+from shared.Base.SharedControls import SharedControls
 
 
-class AppWindow(UserControl):
+class AppWindow(SharedControls):
     """A desktop app layout with a menu on the left."""
 
-    def __init__(self, title, page, *args, window_size=(800, 600), **kwargs):
+    def __init__(self, page, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.page = page
         self.page.on_logout = self.change_page
         self.page.on_login = self.change_page
-        self.user_Auth = UserAuthentication()
         self.expand = True
 
         self.page.on_resize = self.handle_resize
@@ -32,11 +23,11 @@ class AppWindow(UserControl):
         self._was_portrait = self.is_portrait()
         self._panel_visible = self.is_landscape()
 
-        self.appbar = AppHeader(page, user=self.user_Auth, var_on_click=self.change_page)
+        self.appbar = AppHeader(self.page, var_on_click=self.change_page)
         self.page.appbar = self.appbar.app_bar
 
-        self.app_page = AppLayout(page=self.page)
-        self.app_auth = AppAuth(user=self.user_Auth, page=self.page)
+        self.app_page = AppLayout()
+        self.app_auth = AppAuth(self.page)
         self.content_column = Column(controls=self.app_auth.content_area.controls,
                                      horizontal_alignment=ft.CrossAxisAlignment.CENTER,
                                      alignment=ft.MainAxisAlignment.CENTER)
@@ -46,23 +37,21 @@ class AppWindow(UserControl):
         )
         # self.change_page()
 
-        self.window_size = window_size
-        self.page.window_width, self.page.window_height = self.window_size
         self.page.add(self.content)
 
     def change_page(self, event=None):
-        if self.user_Auth.is_login and event is None:
+        if self.user.is_login and event is None:
             self.content_column.controls.clean()
             self.content_column.controls = self.app_page.set_content(self._panel_visible).copy()
             self.appbar.change_btn_logout()
             self.page.appbar.update()
             self.content.update()
-        elif not self.user_Auth.is_login and event is None:
+        elif not self.user.is_login and event is None:
             # self.controls.clear()
             self.content_column.controls = self.app_auth.content_area.controls
             self.content.update()
         elif event is not None:
-            if self.user_Auth.is_login and event.name == 'logout':
+            if self.user.is_login and event.name == 'logout':
                 self.content_column.controls.clear()
                 self.content_column.controls = self.app_page.set_content(self._panel_visible)
                 self.appbar.change_btn_logout()

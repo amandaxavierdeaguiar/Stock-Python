@@ -1,18 +1,15 @@
 import flet as ft
-import hashlib
-import re
-from flet import UserControl, TextField, Image
-from flet_core import LoginEvent
+import asyncio
+from flet import TextField, Image, LoginEvent
 
-from Views.User.ListUser import table_data as db_user
+from views.User.ListUser import table_data as db_user
+from shared.Base.SharedControls import SharedControls
 
 
-class AuthLogin(UserControl):
-    def __init__(self, user, page, select_page, *args, **kwargs):
+class AuthLogin(SharedControls):
+    def __init__(self, page, select_page, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.page = page
-        self.user_Auth = user
-
         self._image: Image = self.image()
         self._input_login: TextField = self.login(self.validate)
         self._input_password: TextField = self.password(self.validate)
@@ -89,9 +86,10 @@ class AuthLogin(UserControl):
             )
         )
 
-    def login_alert(self, event):
-        user = next((item for item in db_user if item['login'] == self._input_login.value), None)
-        if user is None:
+    async def login_alert(self, event):
+        try:
+            await self.user.check(self._input_login.value, self._input_password.value)
+        except Exception as e:
             dlg = ft.AlertDialog(
                 title=ft.Text("Email Inválido"),
                 content=ft.Text("Digite novamente os dados!"),
@@ -100,5 +98,15 @@ class AuthLogin(UserControl):
             dlg.open = True
             self.page.update()
         else:
-            self.user_Auth.is_login = True
-            self.page.logout()
+            print("Nothing went wrong")
+            LoginEvent(error="",
+                       error_description="",
+                       page=self,
+                       control=self,
+                       target="page",
+                       name="on_login",
+                       data="login", )
+
+    @classmethod
+    def test(cls):
+        print('Deu login')

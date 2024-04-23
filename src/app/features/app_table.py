@@ -1,8 +1,10 @@
 import flet as ft
 from flet import Container, UserControl
 
+from shared.Base.SharedControls import SharedControls
 
-class AppTable(UserControl):
+
+class AppTable(SharedControls):
     """
 
     """
@@ -20,15 +22,16 @@ class AppTable(UserControl):
         :param data:
         :return:
         """
+        d = data[0].model_dump()
         col = [ft.DataColumn(label=ft.Text(column.replace("_", " ").capitalize()),
                              on_sort=lambda e: print(f"{e.column_index}, {e.ascending}"),
-                             visible=True) for column in data[0].keys()]
+                             visible=True) for column in d.keys()]
         line = []
         cells = []
         color = ["#ffffff", "#f2f2f2"]
         for j, row in enumerate(data):
             for keys, values in enumerate(row, j):
-                cells.append(ft.DataCell(ft.Text(value=row[values]), visible=True))
+                cells.append(ft.DataCell(ft.Text(value=values[1]), visible=True))
             line.append(ft.DataRow(cells=cells.copy(), color=color[j % 2], selected=True, visible=True,
                                    on_select_changed=lambda e: print(f"row select changed: {e.data}")))
             cells.clear()
