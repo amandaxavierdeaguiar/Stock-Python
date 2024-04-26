@@ -37,10 +37,7 @@ class AppTable(SharedControls):
         color = ["#ffffff", "#f2f2f2"]
         for j, row in enumerate(data):
             for keys, values in enumerate(row, j):
-                if table_name == 'User' and values[0] == 'password':
-                    cells.append(ft.DataCell(ft.Text(value=values[1]), visible=True))
-                else:
-                    cells.append(ft.DataCell(ft.Text(value=values[1]), visible=True))
+                cells.append(ft.DataCell(ft.Text(value=values[1]), visible=True))
             line.append(
                 ft.DataRow(
                     cells=cells.copy(),
