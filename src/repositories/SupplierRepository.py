@@ -1,7 +1,10 @@
 from typing import List
+
+from sqlalchemy import select
 from sqlalchemy.orm import Session
-from models.supplier.orm.SupplierOrm import SupplierOrm
+
 from models.supplier.dto.SupplierDto import SupplierDto
+from models.supplier.orm.SupplierOrm import SupplierOrm
 from shared.Base.BaseRepository import BaseRepository
 from shared.Base.BaseResponse import BaseResponse
 from shared.Enums.TypeResult import TypeResult
@@ -35,7 +38,20 @@ class SupplierRepository(BaseRepository[SupplierDto]):
 
     @classmethod
     def get_all(cls, user_) -> BaseResponse[List[SupplierDto]]:
-        pass
+        statement = select(SupplierOrm)
+        entity = None
+        result = None
+        message = None
+        try:
+            result_exec = cls.session.execute(statement).all()
+
+            entity = [SupplierDto.validate(e[0]) for e in result_exec]
+            result = TypeResult.Success
+        except Exception as e:
+            result = TypeResult.Failure
+            message = e
+        finally:
+            return BaseResponse(entity_=entity, result_=result, session_=cls.session, message_=message, user_=user_)
 
     @classmethod
     def get_by_id(cls, entity: SupplierDto, user_) -> BaseResponse[SupplierDto]:
@@ -48,5 +64,3 @@ class SupplierRepository(BaseRepository[SupplierDto]):
     @classmethod
     def delete(cls, entity: SupplierDto, user_) -> BaseResponse[SupplierDto]:
         pass
-
-

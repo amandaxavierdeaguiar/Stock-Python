@@ -13,25 +13,25 @@ class BaseController(Generic[T], ABC):
 
     @classmethod
     @abstractmethod
-    def add(cls, entity: T, user_) -> BaseResponse[T]:
+    def add(cls, entity: T, user) -> BaseResponse[T]:
         return BaseResponse[T]
 
     @classmethod
     @abstractmethod
-    def get_all(cls, user_) -> BaseResponse[List[T]]:
+    def get_all(cls, user) -> BaseResponse[List[T]]:
         return BaseResponse[List[T]]
 
     @classmethod
     @abstractmethod
-    def get_by_id(cls, entity: T, user_) -> BaseResponse[T]:
+    def get_by_id(cls, entity: T, user) -> BaseResponse[T]:
         return BaseResponse[T]
 
     @classmethod
     @abstractmethod
-    def update(cls, entity: T, user_) -> BaseResponse[T]:
+    def update(cls, entity: T, user) -> BaseResponse[T]:
         return BaseResponse[T]
 
     @classmethod
     @abstractmethod
-    def delete(cls, entity: T, user_) -> BaseResponse[T]:
+    def delete(cls, entity: T, user) -> BaseResponse[T]:
         return BaseResponse[T]

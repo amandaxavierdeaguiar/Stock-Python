@@ -1,13 +1,12 @@
 import flet as ft
-from flet import Container, UserControl
+from flet import Container
 
 from shared.Base.SharedControls import SharedControls
 
 
 class AppTable(SharedControls):
-    """
+    """ """
 
-    """
     def __init__(self, app, page: ft.Page, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._table = self.build()
@@ -16,24 +15,42 @@ class AppTable(SharedControls):
         # self._table = self.get_table()
 
     @classmethod
-    def get_table(cls, data=None):
+    def get_table(cls, select=None, table_name=None, data=None):
         """
 
+        :param select:
+        :param table_name:
         :param data:
-        :return:
+        :return: DataTable
         """
         d = data[0].model_dump()
-        col = [ft.DataColumn(label=ft.Text(column.replace("_", " ").capitalize()),
-                             on_sort=lambda e: print(f"{e.column_index}, {e.ascending}"),
-                             visible=True) for column in d.keys()]
+        col = [
+            ft.DataColumn(
+                label=ft.Text(column.replace("_", " ").capitalize()),
+                on_sort=lambda e: print(f"{e.column_index}, {e.ascending}"),
+                visible=True,
+            )
+            for column in d.keys()
+        ]
         line = []
         cells = []
         color = ["#ffffff", "#f2f2f2"]
         for j, row in enumerate(data):
             for keys, values in enumerate(row, j):
-                cells.append(ft.DataCell(ft.Text(value=values[1]), visible=True))
-            line.append(ft.DataRow(cells=cells.copy(), color=color[j % 2], selected=True, visible=True,
-                                   on_select_changed=lambda e: print(f"row select changed: {e.data}")))
+                if table_name == 'User' and values[0] == 'password':
+                    cells.append(ft.DataCell(ft.Text(value=values[1]), visible=True))
+                else:
+                    cells.append(ft.DataCell(ft.Text(value=values[1]), visible=True))
+            line.append(
+                ft.DataRow(
+                    cells=cells.copy(),
+                    color=color[j % 2],
+                    selected=True,
+                    visible=True,
+                    on_select_changed=select,
+                    data=table_name,
+                )
+            )
             cells.clear()
         return ft.DataTable(
             data_row_color={ft.MaterialState.HOVERED: ft.colors.BLUE_GREY_300},
@@ -52,10 +69,7 @@ class AppTable(SharedControls):
         )
 
     def build(self):
-        return Container(
-            expand=True,
-            content=self.get_table()
-        )
+        return Container(expand=True, content=self.get_table())
 
     @property
     def table(self):

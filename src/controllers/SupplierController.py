@@ -11,21 +11,21 @@ class SupplierController(BaseController[SupplierDto]):
         super().__init__()
 
     @classmethod
-    def add(cls, entity, session_, user) -> BaseResponse[SupplierDto]:
-        return cls.repo.add(entity, session_, user)
+    def add(cls, entity, user) -> BaseResponse[SupplierDto]:
+        return cls.repo.add(entity, user)
 
     @classmethod
-    def get_all(cls, session_):
-        return cls.repo.get_all(session_)
+    def get_all(cls, user):
+        return cls.repo.get_all(user)
 
     @classmethod
-    def get_by_id(cls, entity, session_):
+    def get_by_id(cls, entity, user):
         pass
 
     @classmethod
-    def update(cls, entity, session_) -> None:
+    def update(cls, entity, user) -> None:
         pass
 
     @classmethod
-    def delete(cls, entity, session_) -> None:
+    def delete(cls, entity, user) -> None:
         pass

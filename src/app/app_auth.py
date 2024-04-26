@@ -1,13 +1,13 @@
 import flet as ft
-from flet import Text, Column, UserControl, Control
-from shared.Base.SharedControls import SharedControls
+from flet import Text, Column, Control
 
 from app.features.app_auth_login import AuthLogin
 from app.features.app_auth_registration import AuthRegister
+from shared.Base.SharedControls import SharedControls
 
 
 class AppAuth(SharedControls):
-    def __init__(self,page, *args, **kwargs):
+    def __init__(self, page, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.page = page
         self.auth_login = AuthLogin(self.page, select_page=self.select_page)
@@ -17,38 +17,34 @@ class AppAuth(SharedControls):
         self.btn_signup_submit = self.auth_register.button_cancel
 
         self.pages = [
-            (
-                self.btn_signup_submit,
-                self.auth_login.content
-            ),
-            (
-                self.btn_login_signup,
-                self.auth_register.content
-            ),
+            (self.btn_signup_submit, self.auth_login.content),
+            (self.btn_login_signup, self.auth_register.content),
         ]
 
         self.content_area = self.set_controllers(self.pages)
 
-        self._active_view: Control = Column(controls=[
-            Text("")
-        ], alignment=ft.MainAxisAlignment.CENTER, horizontal_alignment=ft.CrossAxisAlignment.CENTER)
+        self._active_view: Control = Column(
+            controls=[Text("")],
+            alignment=ft.MainAxisAlignment.CENTER,
+            horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+        )
 
-        self.set_content()
+        # self.set_content()
         self._change_displayed_page(self.default_page)
 
     @classmethod
     def button_register(cls, var):
-        return ft.ElevatedButton(text='Cadastra-se', width=140, on_click=var)
+        return ft.ElevatedButton(text="Cadastra-se", width=140, on_click=var)
 
     @classmethod
     def button_submit_register(cls, var):
-        return ft.ElevatedButton(text='Cadastro', width=140, on_click=var)
+        return ft.ElevatedButton(text="Cadastro", width=140, on_click=var)
 
     def select_page(self, event):
-        if event.control.data == 'login_signup':
+        if event.control.data == "login_signup":
             self.default_page = 1
             self._change_displayed_page(1)
-        elif event.control.data == 'signup_submit':
+        elif event.control.data == "signup_submit":
             self.default_page = 0
             self._change_displayed_page(0)
 
@@ -64,9 +60,7 @@ class AppAuth(SharedControls):
             self.page.update()
 
     def set_content(self):
-        self.page.controls = [self.active_view,
-                              self.content_area]
-        return self.controls
+        return [self.active_view, self.content_area]
 
     @property
     def active_view(self):
@@ -78,5 +72,5 @@ class AppAuth(SharedControls):
         self.update()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     ft.app(target=AppAuth, assets_dir="../assets")

@@ -1,11 +1,13 @@
 import flet as ft
-from flet import (UserControl, Column, Container, Row, Text, NavigationRail, NavigationRailDestination,
+from flet import (Column, Container, Row, Text, NavigationRail, NavigationRailDestination,
                   border_radius, colors, padding, margin)
 
+from shared.Base.SharedControls import SharedControls
 
-class AppMenu(UserControl):
-    def __init__(self, page):
-        super().__init__()
+
+class AppMenu(SharedControls):
+    def __init__(self, page, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.page = page
 
     @classmethod
@@ -32,10 +34,10 @@ class AppMenu(UserControl):
     @classmethod
     def create_menu_btn(cls, label_, icon_, type_=None):
         return NavigationRailDestination(
-                label_content=Text(label_, color=ft.colors.BLACK),
-                label=label_,
-                icon=icon_,
-                selected_icon=icon_,
+            label_content=Text(label_, color=ft.colors.BLACK),
+            label=label_,
+            icon=icon_,
+            selected_icon=icon_,
         )
 
     @classmethod

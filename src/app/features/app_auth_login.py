@@ -1,8 +1,7 @@
 import flet as ft
-import asyncio
-from flet import TextField, Image, LoginEvent
+from flet import TextField, Image
+from pydantic_core._pydantic_core import ValidationError
 
-from views.User.ListUser import table_data as db_user
 from shared.Base.SharedControls import SharedControls
 
 
@@ -14,15 +13,29 @@ class AuthLogin(SharedControls):
         self._input_login: TextField = self.login(self.validate)
         self._input_password: TextField = self.password(self.validate)
         self._checkbox_signup = self.checkbox_signup(self.validate)
-        self._button_submit: ft.ElevatedButton = self.button_submit(var_on_click=self.login_alert)
-        self.button_signup: ft.ElevatedButton = self.create_button_signup(data="login_signup",
-                                                                          var_on_change=select_page)
-        self.content = self.get_login(self._image, self._input_login,
-                                      self._input_password, self._checkbox_signup,
-                                      self._button_submit, self.button_signup)
+        self._button_submit: ft.ElevatedButton = self.button_submit(
+            var_on_click=self.login_alert
+        )
+        self.button_signup: ft.ElevatedButton = self.create_button_signup(
+            data="login_signup", var_on_change=select_page
+        )
+        self.content = self.get_login(
+            self._image,
+            self._input_login,
+            self._input_password,
+            self._checkbox_signup,
+            self._button_submit,
+            self.button_signup,
+        )
 
     def validate(self, e: ft.ControlEvent) -> None:
-        if all([self._input_login.value, self._input_password.value, self._checkbox_signup.value]):
+        if all(
+            [
+                self._input_login.value,
+                self._input_password.value,
+                self._checkbox_signup.value,
+            ]
+        ):
             self._button_submit.disabled = False
         else:
             self._button_submit.disabled = True
@@ -35,26 +48,41 @@ class AuthLogin(SharedControls):
 
     @classmethod
     def login(cls, var_on_change=None):
-        return ft.TextField(label="Digite seu email", width=300, prefix_icon=ft.icons.EMAIL, on_change=var_on_change)
+        return ft.TextField(
+            label="Digite seu email",
+            width=300,
+            prefix_icon=ft.icons.EMAIL,
+            on_change=var_on_change,
+        )
 
     @classmethod
     def password(cls, var_on_change=None):
-        return ft.TextField(label="Digite sua Password", width=300, password=True,
-                            can_reveal_password=True,
-                            prefix_icon=ft.icons.LOCK,
-                            on_change=var_on_change)
+        return ft.TextField(
+            label="Digite sua Password",
+            width=300,
+            password=True,
+            can_reveal_password=True,
+            prefix_icon=ft.icons.LOCK,
+            on_change=var_on_change,
+        )
 
     @classmethod
     def checkbox_signup(cls, var_on_change=None):
-        return ft.Checkbox(label='Aceito os termos de uso', value=False, on_change=var_on_change)
+        return ft.Checkbox(
+            label="Aceito os termos de uso", value=False, on_change=var_on_change
+        )
 
     @classmethod
     def button_submit(cls, var_on_click):
-        return ft.ElevatedButton(text='Entre', width=140, disabled=True, on_click=var_on_click, data='login')
+        return ft.ElevatedButton(
+            text="Entre", width=140, disabled=True, on_click=var_on_click, data="login"
+        )
 
     @classmethod
     def create_button_signup(cls, data, var_on_change=None):
-        return ft.ElevatedButton(text='Cadastra-se', width=140, on_click=var_on_change, data=data)
+        return ft.ElevatedButton(
+            text="Cadastra-se", width=140, on_click=var_on_change, data=data
+        )
 
     @classmethod
     def get_login(cls, image, login, password, checkbox, submit, signup):
@@ -65,31 +93,33 @@ class AuthLogin(SharedControls):
             border_radius=20,
             bgcolor="white",
             content=ft.Column(
-                controls=[ft.Column(
-                    controls=[
-                        image,
-                        login,
-                        password,
-                        checkbox,
-                    ],
-                    alignment=ft.MainAxisAlignment.CENTER,
-                    horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-                ),
-                    ft.Row(controls=[
-                        signup,
-                        submit,
-                    ],
+                controls=[
+                    ft.Column(
+                        controls=[
+                            image,
+                            login,
+                            password,
+                            checkbox,
+                        ],
+                        alignment=ft.MainAxisAlignment.CENTER,
+                        horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                    ),
+                    ft.Row(
+                        controls=[
+                            signup,
+                            submit,
+                        ],
                         alignment=ft.MainAxisAlignment.CENTER,
                         spacing=20,
-                    )
+                    ),
                 ],
-            )
+            ),
         )
 
     async def login_alert(self, event):
         try:
             await self.user.check(self._input_login.value, self._input_password.value)
-        except Exception as e:
+        except ValidationError as e:
             dlg = ft.AlertDialog(
                 title=ft.Text("Email Inválido"),
                 content=ft.Text("Digite novamente os dados!"),
@@ -97,16 +127,9 @@ class AuthLogin(SharedControls):
             self.page.dialog = dlg
             dlg.open = True
             self.page.update()
+        except Exception as e:
+            print(e)
         else:
-            print("Nothing went wrong")
-            LoginEvent(error="",
-                       error_description="",
-                       page=self,
-                       control=self,
-                       target="page",
-                       name="on_login",
-                       data="login", )
-
-    @classmethod
-    def test(cls):
-        print('Deu login')
+            message = {"login": True}
+            self.page.pubsub.send_all(message)
+            self.page.update()

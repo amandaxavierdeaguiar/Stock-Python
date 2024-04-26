@@ -7,7 +7,6 @@ from pydantic import ValidationError
 from sqlalchemy.orm import Session
 
 from repositories.UserRepository import UserRepository
-from shared.db.db_conection import get_session
 
 
 class UserAuthentication:
@@ -19,14 +18,11 @@ class UserAuthentication:
     @classmethod
     async def check(cls, login_, password_):
         repo: UserRepository = UserRepository()
-        base = await repo.check_login(login_)
-        hash_salt, hash_pw = base.entity['entity_'].password.split(':')
+        base = await repo.get_by_email(login_)
+        hash_salt, hash_pw = base.entity['entity_'].password.get_secret_value().split(':')
         salt = bytes.fromhex(hash_salt)
         pwd_2 = cls.cript_password(password_, salt)
-        if (password_ is not None
-                and login_ is not None
-                and base.entity is not None
-                and pwd_2 != base.entity['entity_'].password):
+        if cls.check_pwd(pwd_2, base, login_):
             cls.is_login = False
             raise ValidationError("Login Incorreto")
         cls.is_login = True
@@ -34,23 +30,19 @@ class UserAuthentication:
         cls.permissions = cls.give_permissions(base)
 
     @classmethod
-    def user_logout(cls):
-        cls.is_login = False
-        cls.is_login: bool = False
-        cls.login: str = "Login"
-        cls.session: Session
-        cls.permissions: Dict = {}
-
-    @classmethod
-    def create_user(cls, login_, password_):
-        repo: UserRepository = UserRepository()
-        base = repo.get_by_email(login_)
-        if (
+    def check_pwd(cls, password_, base, login_) -> bool:
+        return True if (
                 password_ is not None
                 and login_ is not None
                 and base.entity is not None
-                and password_ != base.entity['entity_'].password
-        ):
+                and password_ != base.entity['entity_'].password.get_secret_value()
+        ) else False
+
+    @classmethod
+    async def create_user(cls, login_, password_):
+        repo: UserRepository = UserRepository()
+        base = await repo.get_by_email(login_)
+        if cls.check_pwd(password_, base, login_):
             cls.is_login = False
             raise ValidationError("Login Incorreto")
         cls.is_login = True
@@ -96,3 +88,11 @@ class UserAuthentication:
         password_hash = hashlib.pbkdf2_hmac(
             'sha256', password.encode('UTF-8'), salt, 100000)
         return f'{salt_hex}:{password_hash.hex()}'
+
+    @classmethod
+    def user_logout(cls):
+        cls.is_login = False
+        cls.is_login: bool = False
+        cls.login: str = "Login"
+        cls.session: Session
+        cls.permissions: Dict = {}

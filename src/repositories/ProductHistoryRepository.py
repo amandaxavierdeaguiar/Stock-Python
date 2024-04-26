@@ -1,4 +1,5 @@
 from typing import List
+
 from sqlalchemy import select
 
 from models.history.dto.ProductHistoryDto import ProductHistoryDto
@@ -16,7 +17,9 @@ class ProductHistoryRepository(BaseRepository[ProductHistoryOrm]):
         super().__init__()
 
     @classmethod
-    def add(cls, entity_dto: ProductHistoryDto, user_) -> BaseResponse[ProductHistoryDto]:
+    def add(
+        cls, entity_dto: ProductHistoryDto, user_
+    ) -> BaseResponse[ProductHistoryDto]:
         entity = None
         result = None
         message = None
@@ -32,37 +35,55 @@ class ProductHistoryRepository(BaseRepository[ProductHistoryOrm]):
             result = TypeResult.Failure
             message = e
         finally:
-            return BaseResponse(entity_=entity, result_=result, session_=cls.session, message_=message, user_=user_)
+            return BaseResponse(
+                entity_=entity,
+                result_=result,
+                session_=cls.session,
+                message_=message,
+                user_=user_,
+            )
 
     @classmethod
     def get_all(cls, user_) -> BaseResponse[List[ProductHistoryDto]]:
         pass
 
     @classmethod
-    def get_by_name(cls, entity_dto: ProductHistoryDto, user_) -> BaseResponse[ProductHistoryDto]:
-        statement = select(ProductHistoryOrm).where(ProductHistoryOrm.product_name == entity_dto.product_name)
+    def get_by_name(cls, name: str, user_) -> BaseResponse[List[ProductHistoryDto]]:
+        statement = select(ProductHistoryOrm).where(
+            ProductHistoryOrm.product_name == name
+        )
         entity = None
         result = None
         message = None
         try:
             # result_exec = session_.exec(statement).one()
-            result_exec = cls.session.execute(statement).one()
-            entity = ProductHistoryDto.model_validate(result_exec[0])
+            result_exec = cls.session.execute(statement).all()
+            entity = [ProductHistoryDto.model_validate(e[0]) for e in result_exec]
             result = TypeResult.Success
         except Exception as e:
             message = e
             result = TypeResult.Failure
         finally:
-            return BaseResponse(entity_=entity, result_=result, session_=cls.session, message_=message, user_=None)
+            return BaseResponse(
+                entity_=entity,
+                result_=result,
+                session_=cls.session,
+                message_=message,
+                user_=user_,
+            )
 
     @classmethod
     def get_by_id(cls, entity: T, user_) -> BaseResponse[T]:
         pass
 
     @classmethod
-    def update(cls, entity: ProductHistoryDto, user_) -> BaseResponse[ProductHistoryDto]:
+    def update(
+        cls, entity: ProductHistoryDto, user_
+    ) -> BaseResponse[ProductHistoryDto]:
         pass
 
     @classmethod
-    def delete(cls, entity: ProductHistoryDto, user_) -> BaseResponse[ProductHistoryDto]:
+    def delete(
+        cls, entity: ProductHistoryDto, user_
+    ) -> BaseResponse[ProductHistoryDto]:
         pass

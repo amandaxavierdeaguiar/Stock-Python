@@ -2,7 +2,7 @@ from typing import List
 
 from models.history.dto.ProductHistoryDto import ProductHistoryDto
 from repositories.ProductHistoryRepository import ProductHistoryRepository
-from shared.Base.BaseController import BaseController, T
+from shared.Base.BaseController import BaseController
 from shared.Base.BaseResponse import BaseResponse
 
 
@@ -21,13 +21,23 @@ class ProductHistoryController(BaseController[ProductHistoryDto]):
         pass
 
     @classmethod
-    def get_by_id(cls, entity: ProductHistoryDto, user_) -> BaseResponse[ProductHistoryDto]:
+    def get_by_id(
+        cls, entity: ProductHistoryDto, user_
+    ) -> BaseResponse[ProductHistoryDto]:
         pass
 
     @classmethod
-    def update(cls, entity: ProductHistoryDto, user_) -> BaseResponse[ProductHistoryDto]:
+    def get_by_name(cls, name: str, user_) -> BaseResponse[List[ProductHistoryDto]]:
+        return cls.repo.get_by_name(name, user_)
+
+    @classmethod
+    def update(
+        cls, entity: ProductHistoryDto, user_
+    ) -> BaseResponse[ProductHistoryDto]:
         pass
 
     @classmethod
-    def delete(cls, entity: ProductHistoryDto, user_) -> BaseResponse[ProductHistoryDto]:
+    def delete(
+        cls, entity: ProductHistoryDto, user_
+    ) -> BaseResponse[ProductHistoryDto]:
         pass

@@ -1,13 +1,10 @@
 from typing import List
 
-from sqlalchemy.orm import Session
-
 from controllers.StockHistoryController import StockHistoryController
 from models.history.dto.StockHistoryDto import StockHistoryDto
 from models.stock.dto import StockDto
-from models.user.auth.UserAuthentication import UserAuthentication
 from repositories.StockRepository import StockRepository
-from shared.Base.BaseController import BaseController, T
+from shared.Base.BaseController import BaseController
 from shared.Base.BaseResponse import BaseResponse
 from shared.Enums.TypeResult import TypeResult
 
@@ -35,8 +32,8 @@ class StockController(BaseController[StockDto]):
         return base
 
     @classmethod
-    def get_all(cls, user_) -> BaseResponse[List[StockDto]]:
-        return cls.repo.get_all(user_)
+    def get_all(cls, user) -> BaseResponse[List[StockDto]]:
+        return cls.repo.get_all(user)
 
     @classmethod
     def get_by_id(cls, entity: StockDto, user_) -> BaseResponse[StockDto]:

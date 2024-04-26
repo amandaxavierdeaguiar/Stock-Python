@@ -1,9 +1,10 @@
 from typing import List
+
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from models.user.orm.UserOrm import UserOrm
 from models.user.dto.UserDto import UserDto
+from models.user.orm.UserOrm import UserOrm
 from shared.Base.BaseRepository import BaseRepository
 from shared.Base.BaseResponse import BaseResponse
 from shared.Enums.TypeResult import TypeResult
@@ -37,14 +38,27 @@ class UserRepository(BaseRepository[UserDto]):
 
     @classmethod
     def get_all(cls, user_) -> BaseResponse[List[UserDto]]:
-        pass
+        statement = select(UserOrm)
+        entity = None
+        result = None
+        message = None
+        try:
+            result_exec = cls.session.execute(statement).all()
+
+            entity = [UserDto.validate(e[0]) for e in result_exec]
+            result = TypeResult.Success
+        except Exception as e:
+            result = TypeResult.Failure
+            message = e
+        finally:
+            return BaseResponse(entity_=entity, result_=result, session_=cls.session, message_=message, user_=user_)
 
     @classmethod
     def get_by_id(cls, entity: UserDto, user_) -> BaseResponse[UserDto]:
         pass
 
     @classmethod
-    async def check_login(cls, login: str):
+    async def get_by_email(cls, login: str) -> BaseResponse[UserDto]:
         statement = select(UserOrm).where(UserOrm.login == login)
         entity = None
         result = None
@@ -61,27 +75,9 @@ class UserRepository(BaseRepository[UserDto]):
             return BaseResponse(entity_=entity, result_=result, session_=cls.session, message_=message, user_=None)
 
     @classmethod
-    def get_by_email(cls, entity: UserDto) -> BaseResponse[UserDto]:
-        statement = select(UserOrm).where(UserOrm.name == f'{entity}')
-        entity = None
-        result = None
-        message = None
-        try:
-            result_exec = cls.session.execute(statement).one()
-
-            entity = UserDto.model_validate(**result_exec[0])
-            result = TypeResult.Success
-        except Exception as e:
-            result = TypeResult.Failure
-            message = e
-        finally:
-            return BaseResponse(entity_=entity, result_=result, session_=cls.session, message_=message, user_=entity)
-
-    @classmethod
     def update(cls, entity: UserDto, user_) -> BaseResponse[UserDto]:
         pass
 
     @classmethod
     def delete(cls, entity: UserDto, user_) -> BaseResponse[UserDto]:
         pass
-
