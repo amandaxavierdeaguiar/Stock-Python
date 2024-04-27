@@ -1,7 +1,10 @@
 from typing import List
-from sqlalchemy.orm import Session
+
 from sqlalchemy import select, update
+
+from models.product.orm.Product import ProductOrm
 from models.stock.dto.StockDto import StockDto
+from models.stock.dto.StockTableDto import StockTableDto
 from models.stock.orm.StockOrm import StockOrm
 from shared.Base.BaseRepository import BaseRepository
 from shared.Base.BaseResponse import BaseResponse
@@ -44,6 +47,69 @@ class StockRepository(BaseRepository[StockDto]):
             result_exec = cls.session.execute(statement).all()
 
             entity = [StockDto.validate(e[0]) for e in result_exec]
+            result = TypeResult.Success
+        except Exception as e:
+            result = TypeResult.Failure
+            message = e
+        finally:
+            return BaseResponse(entity_=entity, result_=result, session_=cls.session, message_=message, user_=user_)
+
+    @classmethod
+    def get_all_table(cls, user_) -> BaseResponse[List[StockTableDto]]:
+        statement = (select(
+            StockOrm.product_bar_cod,
+            StockOrm.product_name,
+            ProductOrm.brand_name,
+            ProductOrm.category_name,
+            ProductOrm.price,
+            StockOrm.quantity,
+            ProductOrm.description,
+            ProductOrm.photo,
+            StockOrm.supplier_name)
+                     .join(StockOrm, ProductOrm.name == StockOrm.product_name, full=True))
+        entity = None
+        result = None
+        message = None
+        try:
+            result_exec = cls.session.execute(statement).mappings().all()
+
+            entity = [StockTableDto.model_validate(e) for e in result_exec]
+            result = TypeResult.Success
+        except Exception as e:
+            result = TypeResult.Failure
+            message = e
+        finally:
+            return BaseResponse(entity_=entity, result_=result, session_=cls.session, message_=message, user_=user_)
+
+    @classmethod
+    def get_search(cls, field, label, user_) -> BaseResponse[List[StockDto]]:
+        w = []
+        if field == 'price':
+            w.append({ProductOrm.price == label})
+        elif field == 'category':
+            w.append({ProductOrm.category_name == label})
+        elif field == 'brand':
+            w.append({ProductOrm.brand_name == label})
+
+        statement = (select(
+            StockOrm.product_bar_cod,
+            StockOrm.product_name,
+            ProductOrm.brand_name,
+            ProductOrm.category_name,
+            ProductOrm.price,
+            StockOrm.quantity,
+            ProductOrm.description,
+            ProductOrm.photo,
+            StockOrm.supplier_name)
+                     .where(**w)
+                     .join(StockOrm, ProductOrm.name == StockOrm.product_name, full=True))
+        entity = None
+        result = None
+        message = None
+        try:
+            result_exec = cls.session.execute(statement).mappings().all()
+
+            entity = [StockTableDto.model_validate(e) for e in result_exec]
             result = TypeResult.Success
         except Exception as e:
             result = TypeResult.Failure

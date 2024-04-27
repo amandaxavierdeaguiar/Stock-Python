@@ -30,7 +30,7 @@ class AppPages(SharedControls):
         :return:
         """
         list_repo = {
-            0: cls.ctrl_stock.get_all(user=cls.user),
+            0: cls.ctrl_stock.get_all_table(user=cls.user),
             1: cls.ctrl_supplier.get_all(user=cls.user),
             2: cls.ctrl_user.get_all(user=cls.user),
         }
@@ -59,7 +59,7 @@ class AppPages(SharedControls):
         return content
 
     @classmethod
-    def create_search(cls):
+    def create_search(cls, var):
         """
 
         :param :
@@ -89,7 +89,7 @@ class AppPages(SharedControls):
                             controls=[
                                 # CAIXAS DA PESQUISA AQUI
                                 ft.TextField(label="Produto", width=300, height=30),
-                                cls.create_panel_search(),
+                                cls.create_panel_search(var),
                             ],
                             alignment=ft.MainAxisAlignment.CENTER,
                             horizontal_alignment=ft.CrossAxisAlignment.CENTER,
@@ -107,10 +107,10 @@ class AppPages(SharedControls):
         )
 
     @classmethod
-    def create_panel_search(cls):
-        category = cls.create_category_box()
-        brand = cls.create_brand_box()
-        price = cls.create_price_box()
+    def create_panel_search(cls, var):
+        category = cls.create_category_box(var)
+        brand = cls.create_brand_box(var)
+        price = cls.create_price_box(var)
         return ft.ExpansionPanelList(
             expand_icon_color=ft.colors.BLACK,
             elevation=7,
@@ -125,14 +125,15 @@ class AppPages(SharedControls):
         )
 
     @classmethod
-    def create_price_box(cls):
+    def create_price_box(cls, var):
         groups, counts = cls.product_view.get_all_prices()
 
         top_3_lines = [
             ft.Checkbox(
                 label=f"{group} ({count})",
                 label_style=ft.TextStyle(color=ft.colors.BLACK),
-                on_change=cls.checkbox_changed,
+                on_change=var,
+                data='price',
             )
             for group, count in zip(groups, counts)
         ]
@@ -152,6 +153,7 @@ class AppPages(SharedControls):
                         ),
                         ft.IconButton(ft.icons.SEARCH_SHARP),
                     ],
+                    data='stock',
                     width=100,
                     spacing=0,
                 )
@@ -164,7 +166,7 @@ class AppPages(SharedControls):
         return exp
 
     @classmethod
-    def create_category_box(cls):
+    def create_category_box(cls, var):
         dict_count_by_category = cls.product_view.get_all_categories()
         top_3_lines = []
         for e in dict_count_by_category:
@@ -172,7 +174,8 @@ class AppPages(SharedControls):
                 ft.Checkbox(
                     label=f"{category} ({e[category]})",
                     label_style=ft.TextStyle(color=ft.colors.BLACK),
-                    on_change=cls.checkbox_changed,
+                    on_change=var,
+                    data='category',
                 )
                 for count, category in enumerate(e)
             ]
@@ -187,6 +190,7 @@ class AppPages(SharedControls):
                         ),
                         ft.IconButton(ft.icons.SEARCH_SHARP),
                     ],
+                    data='stock',
                     alignment=ft.MainAxisAlignment.CENTER,
                     width=100,
                 )
@@ -199,7 +203,7 @@ class AppPages(SharedControls):
         return exp
 
     @classmethod
-    def create_brand_box(cls):
+    def create_brand_box(cls, var):
         dict_count_by_brand = cls.product_view.get_all_brands()
         top_3_lines = []
         for e in dict_count_by_brand:
@@ -207,7 +211,8 @@ class AppPages(SharedControls):
                 ft.Checkbox(
                     label=f"{brand} ({e[brand]})",
                     label_style=ft.TextStyle(color=ft.colors.BLACK),
-                    on_change=cls.checkbox_changed,
+                    on_change=var,
+                    data='brand',
                 )
                 for count, brand in enumerate(e)
             ]
@@ -220,6 +225,7 @@ class AppPages(SharedControls):
                         ft.TextField(label="Procure por Marca", width=200, height=30),
                         ft.IconButton(ft.icons.SEARCH_SHARP),
                     ],
+                    data='stock',
                     width=100,
                 )
             ),
@@ -229,11 +235,6 @@ class AppPages(SharedControls):
             ),
         )
         return exp
-
-    @classmethod
-    async def checkbox_changed(cls, e):
-        pass
-        # await t.update_async()
 
     def handle_change(e: ft.ControlEvent):
         pass

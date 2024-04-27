@@ -10,20 +10,6 @@ class App(SharedControls):
     def __init__(self, page: ft.Page, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.page = page
-        # dto = ProductDto(name='Alho francês', brand_id=19, category_id=1, price=1.1, photo='alho_frances.png',
-        #                  description='Alho francês')
-        # user = UserAuthentication()
-        # controller = ProductController()
-        # test = controller.update(dto, user)
-        # stoc_dto = StockDto(
-        #     product_name="Alho francês",
-        #     quantity=1300,
-        #     product_bar_cod="019-001-17173184",
-        #     supplier_name="Fornecedor 5",
-        # )
-        # user = UserAuthentication()
-        # controller_2 = StockController()
-        # test = controller_2.update(stoc_dto, user)
         self.app_view = Container(
             expand=True,
             expand_loose=True,

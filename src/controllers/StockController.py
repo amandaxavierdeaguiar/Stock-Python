@@ -36,6 +36,14 @@ class StockController(BaseController[StockDto]):
         return cls.repo.get_all(user)
 
     @classmethod
+    def get_all_table(cls, user) -> BaseResponse[List[StockDto]]:
+        return cls.repo.get_all_table(user)
+
+    @classmethod
+    def get_search(cls, field, label, user) -> BaseResponse[List[StockDto]]:
+        return cls.repo.get_search(field, label, user)
+
+    @classmethod
     def get_by_id(cls, entity: StockDto, user_) -> BaseResponse[StockDto]:
         pass
 

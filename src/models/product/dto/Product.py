@@ -10,16 +10,16 @@ class ProductDto(BaseModel):
     photo: str
     description: str
     price: float
-    brand_id: int
-    category_id: int
+    brand_name: str
+    category_name: str
     _bar_cod: str
 
     @computed_field
     @property
     def bar_cod(self) -> str:
         shortuuid.set_alphabet(alphabet="013456789")
-        self._bar_cod = '{:0=3}-{:0=3}-{}'.format(
-            self.brand_id,
-            self.category_id,
+        self._bar_cod = '{}-{}-{}'.format(
+            shortuuid.uuid(self.brand_name)[:3],
+            shortuuid.uuid(self.category_name)[:3],
             shortuuid.uuid(self.name)[:8])
         return self._bar_cod

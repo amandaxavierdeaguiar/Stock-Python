@@ -5,6 +5,7 @@ from app.app_pages import AppPages
 from app.features.app_menu import AppMenu
 from app.features.app_product_description import ProductDescription
 from shared.Base.SharedControls import SharedControls
+from views.Product.ProductView import ProductView
 
 
 class AppLayout(SharedControls):
@@ -12,6 +13,7 @@ class AppLayout(SharedControls):
 
     product_details: ft.BottomSheet
     app_product_description = ProductDescription()
+    product_view = ProductView()
 
     def __init__(self, page, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -52,7 +54,7 @@ class AppLayout(SharedControls):
         self.navigation_rail.extended = True
 
         self.menu_panel = self.app_menu.get_menu(self.navigation_rail)
-        self.search_panel = self.app_pages.create_search()
+        self.search_panel = self.app_pages.create_search(self.checkbox_changed)
 
         page_contents = [page_content for _, page_content in pages]
         self.content_area = Column(controls=page_contents, expand=True)
@@ -81,6 +83,20 @@ class AppLayout(SharedControls):
 
         self.set_content()
         self._change_displayed_page()
+
+    @classmethod
+    async def checkbox_changed(cls, e):
+        list_tables = {
+            "price": 'Stock',
+            "category": 'Stock',
+            "brand": 'Stock',
+        }
+        table = list_tables[e.control.data]
+        field = e.control.data
+        label, qnt = e.control.label.split('(')
+        label = label.replace(' ', '')
+        cls.product_view.search(table, label, field)
+        print()
 
     @classmethod
     async def row_selected(cls, event):

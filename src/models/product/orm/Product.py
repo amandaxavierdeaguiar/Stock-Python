@@ -1,5 +1,6 @@
 from sqlalchemy import Column, Double, ForeignKey, String, Integer
-from sqlalchemy.orm import mapped_column, Mapped, relationship
+from sqlalchemy.orm import mapped_column, Mapped
+
 from shared.Base.Base import Base
 
 
@@ -12,5 +13,5 @@ class ProductOrm(Base):
     photo = Column(String(256), nullable=True)
     description = Column(String(256), nullable=False)
     price = Column(Double, nullable=False)
-    brand_id: Mapped[int] = mapped_column(ForeignKey("brand.id"))
-    category_id: Mapped[int] = mapped_column(ForeignKey("category.id"))
+    brand_name: Mapped[str] = mapped_column(ForeignKey("brand.name"))
+    category_name: Mapped[str] = mapped_column(ForeignKey("category.name"))
