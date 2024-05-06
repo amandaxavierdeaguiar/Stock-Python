@@ -1,11 +1,11 @@
 import flet as ft
 from flet import Text, Column, Card, Row, Container
 
-from app.features.app_table import AppTable
+from app.page.features.app_table import AppTable
 from controllers.StockController import StockController
 from controllers.SupplierController import SupplierController
 from controllers.UserController import UserController
-from shared.Base.SharedControls import SharedControls
+from shared.base.SharedControls import SharedControls
 from views.Product.ProductView import ProductView
 
 
@@ -21,9 +21,11 @@ class AppPages(SharedControls):
         super().__init__(page, *args, **kwargs)
 
     @classmethod
-    def create_content(cls, row, table, view=0):
+    def create_content(cls, row, table, view=0, show=None, new_data=None):
         """
 
+        :param show:
+        :param new_data:
         :param table:
         :param row:
         :param view:
@@ -38,7 +40,9 @@ class AppPages(SharedControls):
         list_view = ft.ListView(
             controls=[
                 AppTable.get_table(
-                    data=base.entity["entity_"], select=row, table_name=table
+                    data=base.entity["entity_"] if new_data is None else new_data,
+                    select=row,
+                    table_name=table
                 ),
             ],
             spacing=10,
@@ -59,7 +63,7 @@ class AppPages(SharedControls):
         return content
 
     @classmethod
-    def create_search(cls, var):
+    def create_search(cls, var, new_data=None):
         """
 
         :param :
@@ -88,8 +92,9 @@ class AppPages(SharedControls):
                         content=ft.Column(
                             controls=[
                                 # CAIXAS DA PESQUISA AQUI
-                                ft.TextField(label="Produto", width=300, height=30),
-                                cls.create_panel_search(var),
+                                ft.TextField(label="Produto", width=300, height=30, on_submit=var, data='product_name'),
+                                cls.create_panel_search(var) if new_data is None else cls.create_panel_search(var,
+                                                                                                              new_data),
                             ],
                             alignment=ft.MainAxisAlignment.CENTER,
                             horizontal_alignment=ft.CrossAxisAlignment.CENTER,
@@ -107,10 +112,15 @@ class AppPages(SharedControls):
         )
 
     @classmethod
-    def create_panel_search(cls, var):
-        category = cls.create_category_box(var)
-        brand = cls.create_brand_box(var)
-        price = cls.create_price_box(var)
+    def create_panel_search(cls, var, new_data=None):
+        if new_data is None:
+            category = cls.create_category_box(var)
+            brand = cls.create_brand_box(var)
+            price = cls.create_price_box(var)
+        else:
+            category = cls.create_category_box(var, new_data)
+            brand = cls.create_brand_box(var, new_data)
+            price = cls.create_price_box(var, new_data)
         return ft.ExpansionPanelList(
             expand_icon_color=ft.colors.BLACK,
             elevation=7,
@@ -125,12 +135,16 @@ class AppPages(SharedControls):
         )
 
     @classmethod
-    def create_price_box(cls, var):
-        groups, counts = cls.product_view.get_all_prices()
+    def create_price_box(cls, var, new_data=None):
+        groups, counts = None, None
+        if new_data is None:
+            groups, counts = cls.product_view.get_all_prices()
+        else:
+            groups, counts = cls.product_view.get_all_prices(new_data)
 
         top_3_lines = [
             ft.Checkbox(
-                label=f"{group} ({count})",
+                label=f"{group.left} - {group.right}  ({count})",
                 label_style=ft.TextStyle(color=ft.colors.BLACK),
                 on_change=var,
                 data='price',
@@ -166,27 +180,30 @@ class AppPages(SharedControls):
         return exp
 
     @classmethod
-    def create_category_box(cls, var):
-        dict_count_by_category = cls.product_view.get_all_categories()
-        top_3_lines = []
-        for e in dict_count_by_category:
-            top_3_lines = [
-                ft.Checkbox(
-                    label=f"{category} ({e[category]})",
-                    label_style=ft.TextStyle(color=ft.colors.BLACK),
-                    on_change=var,
-                    data='category',
-                )
-                for count, category in enumerate(e)
-            ]
-        top_3 = ft.ListView(auto_scroll=False, controls=top_3_lines)
+    def create_category_box(cls, var, new_data=None):
+        dict_count_by_category = None
+        if new_data is None:
+            dict_count_by_category = cls.product_view.get_top_categories()
+        else:
+            dict_count_by_category = cls.product_view.get_top_categories(new_data)
+        top_5_lines = []
+        top_5_lines = [
+            ft.Checkbox(
+                label=f"{category[0]} ({category[1]})",
+                label_style=ft.TextStyle(color=ft.colors.BLACK),
+                on_change=var,
+                data='category',
+            )
+            for i, category in enumerate(dict_count_by_category.items())
+        ]
+        top_3 = ft.ListView(auto_scroll=False, controls=top_5_lines)
         exp = ft.ExpansionPanel(
             bgcolor=ft.colors.GREY_50,
             header=ft.ListTile(
                 title=Row(
                     controls=[
                         ft.TextField(
-                            label="Procure por Categoria", width=200, height=30
+                            label="Procure por Categoria", width=200, height=30, on_submit=var, data='category_name'
                         ),
                         ft.IconButton(ft.icons.SEARCH_SHARP),
                     ],
@@ -203,26 +220,29 @@ class AppPages(SharedControls):
         return exp
 
     @classmethod
-    def create_brand_box(cls, var):
-        dict_count_by_brand = cls.product_view.get_all_brands()
+    def create_brand_box(cls, var, new_data=None):
+        dict_count_by_brand = None
+        if new_data is None:
+            dict_count_by_brand = cls.product_view.get_top_brands()
+        else:
+            dict_count_by_brand = cls.product_view.get_top_brands(new_data)
         top_3_lines = []
-        for e in dict_count_by_brand:
-            top_3_lines = [
-                ft.Checkbox(
-                    label=f"{brand} ({e[brand]})",
-                    label_style=ft.TextStyle(color=ft.colors.BLACK),
-                    on_change=var,
-                    data='brand',
-                )
-                for count, brand in enumerate(e)
-            ]
+        top_3_lines = [
+            ft.Checkbox(
+                label=f"{brand[0]} ({brand[1]})",
+                label_style=ft.TextStyle(color=ft.colors.BLACK),
+                on_change=var,
+                data='brand',
+            )
+            for count, brand in enumerate(dict_count_by_brand.items())
+        ]
         top_3 = ft.ListView(auto_scroll=False, controls=top_3_lines)
         exp = ft.ExpansionPanel(
             bgcolor=ft.colors.GREY_50,
             header=ft.ListTile(
                 title=Row(
                     controls=[
-                        ft.TextField(label="Procure por Marca", width=200, height=30),
+                        ft.TextField(label="Procure por Marca", width=200, height=30, on_submit=var, data='brand_name'),
                         ft.IconButton(ft.icons.SEARCH_SHARP),
                     ],
                     data='stock',
@@ -236,7 +256,8 @@ class AppPages(SharedControls):
         )
         return exp
 
-    def handle_change(e: ft.ControlEvent):
+    @classmethod
+    def handle_change(cls, e: ft.ControlEvent):
         pass
 
     @classmethod

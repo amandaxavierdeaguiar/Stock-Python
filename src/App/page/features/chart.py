@@ -1,9 +1,9 @@
 import flet as ft
 
-from shared.Base.SharedControls import SharedControls
+from shared.base.SharedControls import SharedControls
 
 
-class DateQuantity(SharedControls):
+class Charts(SharedControls):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -28,7 +28,7 @@ class DateQuantity(SharedControls):
             border=ft.border.all(3, ft.colors.with_opacity(0.2, ft.colors.ON_SURFACE)),
             left_axis=ft.ChartAxis(
                 title=ft.Text(
-                    "Quantidades",
+                    value=data['name'],
                     size=14,
                     weight=ft.FontWeight.BOLD,
                     color=ft.colors.BLUE,
@@ -44,9 +44,9 @@ class DateQuantity(SharedControls):
                 ),
                 labels=cls.create_x(data),
                 show_labels=True,
-                labels_size=17,
+                labels_size=27,
                 title_size=30,
-                labels_interval=1,
+                labels_interval=data["length"] // 6,
             ),
             right_axis=ft.ChartAxis(
                 labels=[ft.ChartAxisLabel(value=0, label=ft.Text())],
@@ -79,10 +79,11 @@ class DateQuantity(SharedControls):
     def create_x(cls, data):
         x = []
         for i, value in enumerate(data["x"]):
+            date = f'{value.hour}:{value.minute}\n{value.year}-{value.month}-{value.day}'
             x.append(
                 ft.ChartAxisLabel(
                     value=i,
-                    label=ft.Text(value=value, size=10, weight=ft.FontWeight.BOLD),
+                    label=ft.Text(value=date, size=10, weight=ft.FontWeight.BOLD, text_align=ft.TextAlign.CENTER),
                 )
             )
         return x

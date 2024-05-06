@@ -1,9 +1,9 @@
 import flet as ft
 from flet import Text, Column, Control
 
-from app.features.app_auth_login import AuthLogin
-from app.features.app_auth_registration import AuthRegister
-from shared.Base.SharedControls import SharedControls
+from app.page.features.app_auth_login import AuthLogin
+from app.page.features.app_auth_registration import AuthRegister
+from shared.base.SharedControls import SharedControls
 
 
 class AppAuth(SharedControls):
@@ -73,4 +73,4 @@ class AppAuth(SharedControls):
 
 
 if __name__ == "__main__":
-    ft.app(target=AppAuth, assets_dir="../assets")
+    ft.app(target=AppAuth, assets_dir="../../../assets")

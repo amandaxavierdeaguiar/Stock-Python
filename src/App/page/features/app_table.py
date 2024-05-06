@@ -1,7 +1,7 @@
 import flet as ft
 from flet import Container
 
-from shared.Base.SharedControls import SharedControls
+from shared.base.SharedControls import SharedControls
 
 
 class AppTable(SharedControls):
@@ -9,7 +9,6 @@ class AppTable(SharedControls):
 
     def __init__(self, app, page: ft.Page, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self._table = self.build()
         self.app_layout = app
         self.page = page
         # self._table = self.get_table()
@@ -67,12 +66,3 @@ class AppTable(SharedControls):
 
     def build(self):
         return Container(expand=True, content=self.get_table())
-
-    @property
-    def table(self):
-        return self._table
-
-    @table.setter
-    def table(self, new_table):
-        self._table = new_table
-        self.update()

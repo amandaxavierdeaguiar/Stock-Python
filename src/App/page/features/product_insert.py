@@ -1,8 +1,6 @@
 import base64
 
 import flet as ft
-from Views.Product.ListProduct import brand_list as db_brands
-from Views.Product.ListProduct import category_list as db_category
 from flet import colors, icons, IconButton
 
 
@@ -31,7 +29,7 @@ class ProductNew:
         )  # ver como fica para ser float
 
         # Criando uma lista para o box da Categoria
-        category_list = db_category
+        category_list = []
 
         # Puxando cada item da lista Categoria
         self.c = ft.Dropdown(label="Categoria", width=300)
@@ -39,7 +37,7 @@ class ProductNew:
             self.c.options.append(ft.dropdown.Option(category))
 
         # Criando a lista Marca
-        brand_list = db_brands
+        brand_list = []
 
         # Puxando cada item da lista Marca
         self.b = ft.Dropdown(label="Marca", width=300)
