@@ -6,9 +6,9 @@ from models.product.orm.Product import ProductOrm
 from models.stock.dto.StockDto import StockDto
 from models.stock.dto.StockTableDto import StockTableDto
 from models.stock.orm.StockOrm import StockOrm
-from shared.Base.BaseRepository import BaseRepository
-from shared.Base.BaseResponse import BaseResponse
 from shared.Enums.TypeResult import TypeResult
+from shared.base.BaseRepository import BaseRepository
+from shared.base.BaseResponse import BaseResponse
 from shared.db.db_conection import get_session
 
 
@@ -82,14 +82,18 @@ class StockRepository(BaseRepository[StockDto]):
             return BaseResponse(entity_=entity, result_=result, session_=cls.session, message_=message, user_=user_)
 
     @classmethod
-    def get_search(cls, field, label, user_) -> BaseResponse[List[StockDto]]:
-        w = []
-        if field == 'price':
-            w.append({ProductOrm.price == label})
-        elif field == 'category':
-            w.append({ProductOrm.category_name == label})
-        elif field == 'brand':
-            w.append({ProductOrm.brand_name == label})
+    def get_search(cls, search, user_) -> BaseResponse[List[StockTableDto]]:
+        w = {}
+        for field in search['fields']:
+            if field[0] == 'price':
+                label1, label2 = field[1].split('-')
+                w = {ProductOrm.price.between(label1, label2)}
+            elif field[0] == 'category' or field[0] == 'category_name':
+                w = {ProductOrm.category_name == field[1]}
+            elif field[0] == 'brand' or field[0] == 'brand_name':
+                w = {ProductOrm.brand_name == field[1]}
+            elif field[0] == 'product_name':
+                w = {ProductOrm.name.like(f"%{field[1]}%")}
 
         statement = (select(
             StockOrm.product_bar_cod,
@@ -101,7 +105,7 @@ class StockRepository(BaseRepository[StockDto]):
             ProductOrm.description,
             ProductOrm.photo,
             StockOrm.supplier_name)
-                     .where(**w)
+                     .filter(*w)
                      .join(StockOrm, ProductOrm.name == StockOrm.product_name, full=True))
         entity = None
         result = None

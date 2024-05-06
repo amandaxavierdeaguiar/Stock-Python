@@ -1,3 +1,5 @@
+from typing import Optional
+
 from pydantic import BaseModel, ConfigDict
 
 
@@ -9,7 +11,7 @@ class StockTableDto(BaseModel):
     category_name: str
     brand_name: str
     description: str
-    photo: str
+    photo: Optional[str] = None
     supplier_name: str
     quantity: float
     price: float

@@ -3,10 +3,11 @@ from typing import List
 from controllers.StockHistoryController import StockHistoryController
 from models.history.dto.StockHistoryDto import StockHistoryDto
 from models.stock.dto import StockDto
+from models.stock.dto.StockTableDto import StockTableDto
 from repositories.StockRepository import StockRepository
-from shared.Base.BaseController import BaseController
-from shared.Base.BaseResponse import BaseResponse
 from shared.Enums.TypeResult import TypeResult
+from shared.base.BaseController import BaseController
+from shared.base.BaseResponse import BaseResponse
 
 
 class StockController(BaseController[StockDto]):
@@ -36,12 +37,12 @@ class StockController(BaseController[StockDto]):
         return cls.repo.get_all(user)
 
     @classmethod
-    def get_all_table(cls, user) -> BaseResponse[List[StockDto]]:
+    def get_all_table(cls, user) -> BaseResponse[List[StockTableDto]]:
         return cls.repo.get_all_table(user)
 
     @classmethod
-    def get_search(cls, field, label, user) -> BaseResponse[List[StockDto]]:
-        return cls.repo.get_search(field, label, user)
+    def get_search(cls, search, user) -> BaseResponse[List[StockTableDto]]:
+        return cls.repo.get_search(search, user)
 
     @classmethod
     def get_by_id(cls, entity: StockDto, user_) -> BaseResponse[StockDto]:

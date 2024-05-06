@@ -1,5 +1,6 @@
-import shortuuid
+from typing import Optional
 
+import shortuuid
 from pydantic import BaseModel, computed_field, ConfigDict
 
 
@@ -7,7 +8,7 @@ class ProductDto(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     name: str
-    photo: str
+    photo: Optional[str] = None
     description: str
     price: float
     brand_name: str

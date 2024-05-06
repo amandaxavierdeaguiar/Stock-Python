@@ -1,10 +1,11 @@
 import flet as ft
 from flet import Text, Column, icons, Control, IconButton, colors
 
-from app.app_pages import AppPages
-from app.features.app_menu import AppMenu
-from app.features.app_product_description import ProductDescription
-from shared.Base.SharedControls import SharedControls
+from app.page.app_menu import AppMenu
+from app.page.app_pages import AppPages
+from app.page.features.app_product_description import ProductDescription
+from app.page.features.app_product_edit import ProductEdit
+from shared.base.SharedControls import SharedControls
 from views.Product.ProductView import ProductView
 
 
@@ -12,8 +13,15 @@ class AppLayout(SharedControls):
     """ """
 
     product_details: ft.BottomSheet
+    content_area: Column
+    navigation_rail: ft.NavigationRail
     app_product_description = ProductDescription()
+    app_product_edit = ProductEdit()
     product_view = ProductView()
+    search = {
+        'table': None,
+        'fields': [],
+    }
 
     def __init__(self, page, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -21,6 +29,7 @@ class AppLayout(SharedControls):
         self.details()
         self.app_menu = AppMenu(self.page)
         self.app_pages = AppPages(self.page, self.user)
+        ft.FilePicker()
 
         pages = [
             (
@@ -84,19 +93,40 @@ class AppLayout(SharedControls):
         self.set_content()
         self._change_displayed_page()
 
-    @classmethod
-    async def checkbox_changed(cls, e):
+    # @classmethod
+    async def checkbox_changed(self, e):
         list_tables = {
+            "product_name": 'Stock',
             "price": 'Stock',
             "category": 'Stock',
+            "category_name": 'Stock',
             "brand": 'Stock',
+            "brand_name": 'Stock',
         }
-        table = list_tables[e.control.data]
-        field = e.control.data
-        label, qnt = e.control.label.split('(')
-        label = label.replace(' ', '')
-        cls.product_view.search(table, label, field)
-        print()
+        label = None
+        if e.name == 'submit':
+            label = e.control.value.capitalize()
+        elif e.name == 'change':
+            label, qnt = e.control.label.split('(')
+            label = label.replace(' ', '')
+
+        if self.search['table'] != list_tables[e.control.data] and self.search['table'] is not None:
+            self.search['table'] = list_tables[e.control.data]
+            self.search['fields'].clear()
+            self.search['fields'].append([e.control.data, label])
+        else:
+            self.search['table'] = list_tables[e.control.data]
+            self.search['fields'].append([e.control.data, label])
+        base = self.product_view.search(self.search)
+        page_number = self.navigation_rail.selected_index
+        new_search_panel = self.app_pages.create_search(self.checkbox_changed, base)
+        new_table = self.app_pages.create_content(view=page_number,
+                                                  row=self.row_selected,
+                                                  table="Stock",
+                                                  new_data=base.entity["entity_"])
+        self.content_area.controls[page_number].content = new_table
+        self.search_panel.content = new_search_panel.content
+        self.page.update()
 
     @classmethod
     async def row_selected(cls, event):
@@ -111,11 +141,16 @@ class AppLayout(SharedControls):
         await cls.show_bs(selected, event.control.data)
 
     @classmethod
+    async def change_bs(cls, event):
+        # await cls.close_bs(event)
+        selected = cls.app_product_description.selected
+        await cls.show_bs(selected, event.control.data)
+
+    @classmethod
     def details(cls):
         cls.product_details = ft.BottomSheet(
             open=False,
             on_dismiss=cls.bs_dismissed,
-            elevation=0.7,
             maintain_bottom_view_insets_padding=True,
             use_safe_area=True,
         )
@@ -133,7 +168,9 @@ class AppLayout(SharedControls):
     async def show_bs(cls, selected, table):
         # Alterar o description do Supplier e do User
         details = {
-            "Stock": cls.app_product_description.get_content(selected),
+            "Stock": cls.app_product_description.get_content(selected, show=cls.change_bs),
+            "Stock_edit": cls.app_product_edit.get_content(selected, show=cls.change_bs),
+            "Stock_insert": cls.app_product_description.get_content(selected, show=cls.change_bs),
             "Supplier": cls.app_product_description.get_content(selected),
             "User": cls.app_product_description.get_content(selected),
         }
