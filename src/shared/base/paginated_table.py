@@ -1,17 +1,5 @@
 import flet as ft
 
-"""
-PaginatedDataTable is based on flet.UserControl.
-Feel free to modify it entirely so it could fit your likings and/or needs.
-
-`How to use:`
-After initializing the object, you can access the DataTable, DataRow, or DataColumn instances
-using the following attributes:
-    - `datatable`
-    - `datarows`
-    - `datacolumns`
-"""
-
 
 class PaginatedDataTable(ft.UserControl):
     # a default number of rows per page to be used in the data table
