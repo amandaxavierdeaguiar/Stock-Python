@@ -3,7 +3,7 @@ import flet as ft
 from flet import Container, padding, margin
 
 from app.app_window import AppWindow
-from shared.Base.SharedControls import SharedControls
+from shared.base.SharedControls import SharedControls
 
 
 class App(SharedControls):
@@ -31,6 +31,7 @@ def main(page: ft.Page):
     page.padding = padding.all(0)
     page.margin = margin.all(0)
     page.bgcolor = ft.colors.GREY_200
+    page.theme_mode = ft.ThemeMode.LIGHT
 
     app = App(page)
     page.add(app)
