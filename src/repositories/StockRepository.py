@@ -65,6 +65,7 @@ class StockRepository(BaseRepository[StockDto]):
             StockOrm.quantity,
             ProductOrm.description,
             ProductOrm.photo,
+            ProductOrm.quantity_type,
             StockOrm.supplier_name)
                      .join(StockOrm, ProductOrm.name == StockOrm.product_name, full=True))
         entity = None
@@ -104,6 +105,7 @@ class StockRepository(BaseRepository[StockDto]):
             StockOrm.quantity,
             ProductOrm.description,
             ProductOrm.photo,
+            ProductOrm.quantity_type,
             StockOrm.supplier_name)
                      .filter(*w)
                      .join(StockOrm, ProductOrm.name == StockOrm.product_name, full=True))

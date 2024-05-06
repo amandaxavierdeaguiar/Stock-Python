@@ -15,3 +15,4 @@ class StockTableDto(BaseModel):
     supplier_name: str
     quantity: float
     price: float
+    quantity_type: str
