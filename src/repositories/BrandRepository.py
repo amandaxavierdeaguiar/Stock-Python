@@ -2,11 +2,11 @@ from typing import List
 
 from sqlalchemy import select
 
-from models.brand.orm.BrandOrm import BrandOrm as brand
 from models.brand.dto.BrandDto import BrandDto
-from shared.Base.BaseRepository import BaseRepository
-from shared.Base.BaseResponse import BaseResponse
+from models.brand.orm.BrandOrm import BrandOrm as brand
 from shared.Enums.TypeResult import TypeResult
+from shared.base.BaseRepository import BaseRepository
+from shared.base.BaseResponse import BaseResponse
 from shared.db.db_conection import get_session
 
 

@@ -2,8 +2,8 @@ from typing import List
 
 from models.history.dto.ProductHistoryDto import ProductHistoryDto
 from repositories.ProductHistoryRepository import ProductHistoryRepository
-from shared.Base.BaseController import BaseController
-from shared.Base.BaseResponse import BaseResponse
+from shared.base.BaseController import BaseController
+from shared.base.BaseResponse import BaseResponse
 
 
 class ProductHistoryController(BaseController[ProductHistoryDto]):
@@ -22,7 +22,7 @@ class ProductHistoryController(BaseController[ProductHistoryDto]):
 
     @classmethod
     def get_by_id(
-        cls, entity: ProductHistoryDto, user_
+            cls, entity: ProductHistoryDto, user_
     ) -> BaseResponse[ProductHistoryDto]:
         pass
 
@@ -32,12 +32,12 @@ class ProductHistoryController(BaseController[ProductHistoryDto]):
 
     @classmethod
     def update(
-        cls, entity: ProductHistoryDto, user_
+            cls, entity: ProductHistoryDto, user_
     ) -> BaseResponse[ProductHistoryDto]:
         pass
 
     @classmethod
     def delete(
-        cls, entity: ProductHistoryDto, user_
+            cls, entity: ProductHistoryDto, user_
     ) -> BaseResponse[ProductHistoryDto]:
         pass

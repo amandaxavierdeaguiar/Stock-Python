@@ -1,9 +1,7 @@
 from sqlalchemy import Column, Double, ForeignKey, Integer
-from sqlalchemy.orm import declarative_base, mapped_column, Mapped, relationship
-from shared.Base.Base import Base
+from sqlalchemy.orm import mapped_column, Mapped
 
-from models.product.orm.Product import ProductOrm
-from models.supplier.orm.SupplierOrm import SupplierOrm
+from shared.base.Base import Base
 
 
 class StockOrm(Base):

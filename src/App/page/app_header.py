@@ -9,7 +9,7 @@ from flet import (
     margin,
 )
 
-from shared.Base.SharedControls import SharedControls
+from shared.base.SharedControls import SharedControls
 
 
 class AppHeader(SharedControls):

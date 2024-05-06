@@ -2,8 +2,8 @@ from typing import List
 
 from models.history.dto.StockHistoryDto import StockHistoryDto
 from repositories.StockHistoryRepository import StockHistoryRepository
-from shared.Base.BaseController import BaseController, T
-from shared.Base.BaseResponse import BaseResponse
+from shared.base.BaseController import BaseController
+from shared.base.BaseResponse import BaseResponse
 
 
 class StockHistoryController(BaseController[StockHistoryDto]):

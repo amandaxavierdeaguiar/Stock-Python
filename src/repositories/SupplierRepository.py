@@ -5,9 +5,9 @@ from sqlalchemy.orm import Session
 
 from models.supplier.dto.SupplierDto import SupplierDto
 from models.supplier.orm.SupplierOrm import SupplierOrm
-from shared.Base.BaseRepository import BaseRepository
-from shared.Base.BaseResponse import BaseResponse
 from shared.Enums.TypeResult import TypeResult
+from shared.base.BaseRepository import BaseRepository
+from shared.base.BaseResponse import BaseResponse
 from shared.db.db_conection import get_session
 
 

@@ -4,9 +4,9 @@ from controllers.ProductHistoryController import ProductHistoryController
 from models.history.dto.ProductHistoryDto import ProductHistoryDto
 from models.product.dto.Product import ProductDto
 from repositories.ProductRepository import ProductRepository
-from shared.Base.BaseController import BaseController, T
-from shared.Base.BaseResponse import BaseResponse
 from shared.Enums.TypeResult import TypeResult
+from shared.base.BaseController import BaseController
+from shared.base.BaseResponse import BaseResponse
 
 
 class ProductController(BaseController[ProductDto]):
@@ -44,6 +44,10 @@ class ProductController(BaseController[ProductDto]):
 
     @classmethod
     def update(cls, entity_dto: ProductDto, user_) -> BaseResponse[ProductDto]:
+        return cls.repo.update(entity_dto, user_)
+
+    @classmethod
+    def update_price(cls, entity_dto: ProductDto, user_) -> BaseResponse[ProductDto]:
         base = cls.repo.update(entity_dto, user_)
         if base.result == TypeResult.Success:
             to_pass = {
@@ -60,4 +64,3 @@ class ProductController(BaseController[ProductDto]):
     @classmethod
     def delete(cls, entity: ProductDto, user_) -> BaseResponse[ProductDto]:
         pass
-

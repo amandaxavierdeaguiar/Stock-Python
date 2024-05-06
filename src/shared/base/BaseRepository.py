@@ -3,7 +3,7 @@ from typing import Generic, TypeVar, List
 
 from pydantic import BaseModel
 
-from shared.Base.BaseResponse import BaseResponse
+from shared.base.BaseResponse import BaseResponse
 
 T = TypeVar('T', bound=BaseModel)
 

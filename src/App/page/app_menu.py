@@ -2,7 +2,7 @@ import flet as ft
 from flet import (Column, Container, Row, Text, NavigationRail, NavigationRailDestination,
                   border_radius, colors, padding, margin)
 
-from shared.Base.SharedControls import SharedControls
+from shared.base.SharedControls import SharedControls
 
 
 class AppMenu(SharedControls):

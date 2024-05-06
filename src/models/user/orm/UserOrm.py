@@ -1,9 +1,8 @@
 from sqlalchemy import Column, String, Integer
-from sqlalchemy.orm import declarative_base
 from sqlalchemy.types import Enum
 
 from shared.Enums.TypeAccess import TypeAccess
-from shared.Base.Base import Base
+from shared.base.Base import Base
 
 
 class UserOrm(Base):

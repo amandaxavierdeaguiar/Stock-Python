@@ -1,10 +1,10 @@
 import flet as ft
 from flet import Container, Column, Row
 
-from app.app_auth import AppAuth
 from app.app_layout import AppLayout
-from app.features.app_header import AppHeader
-from shared.Base.SharedControls import SharedControls
+from app.page.app_header import AppHeader
+from app.page.url.app_auth import AppAuth
+from shared.base.SharedControls import SharedControls
 
 
 class AppWindow(SharedControls):
@@ -47,7 +47,11 @@ class AppWindow(SharedControls):
             content_column = Row(controls=new, expand=True)
             content = Container(expand=True, content=content_column)
             self.page.controls = [content]
-        self.page.update()
+            self.page.update()
+        # try:
+        #     self.page.update()
+        # except Exception as e:
+        #     print(e)
 
     def change_page(self, event=None):
         if event["login"]:

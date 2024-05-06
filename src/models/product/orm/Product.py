@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Double, ForeignKey, String, Integer
 from sqlalchemy.orm import mapped_column, Mapped
 
-from shared.Base.Base import Base
+from shared.base.Base import Base
 
 
 class ProductOrm(Base):

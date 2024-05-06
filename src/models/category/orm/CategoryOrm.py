@@ -1,5 +1,6 @@
 from sqlalchemy import Column, String, Integer
-from shared.Base.Base import Base
+
+from shared.base.Base import Base
 
 
 class CategoryOrm(Base):

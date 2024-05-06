@@ -1,8 +1,7 @@
 import flet as ft
 from flet import TextField, Image
-from pydantic_core._pydantic_core import ValidationError
 
-from shared.Base.SharedControls import SharedControls
+from shared.base.SharedControls import SharedControls
 
 
 class AuthLogin(SharedControls):
@@ -30,11 +29,11 @@ class AuthLogin(SharedControls):
 
     def validate(self, e: ft.ControlEvent) -> None:
         if all(
-            [
-                self._input_login.value,
-                self._input_password.value,
-                self._checkbox_signup.value,
-            ]
+                [
+                    self._input_login.value,
+                    self._input_password.value,
+                    self._checkbox_signup.value,
+                ]
         ):
             self._button_submit.disabled = False
         else:
@@ -119,7 +118,7 @@ class AuthLogin(SharedControls):
     async def login_alert(self, event):
         try:
             await self.user.check(self._input_login.value, self._input_password.value)
-        except ValidationError as e:
+        except Exception as e:
             dlg = ft.AlertDialog(
                 title=ft.Text("Email Inválido"),
                 content=ft.Text("Digite novamente os dados!"),
@@ -127,8 +126,6 @@ class AuthLogin(SharedControls):
             self.page.dialog = dlg
             dlg.open = True
             self.page.update()
-        except Exception as e:
-            print(e)
         else:
             message = {"login": True}
             self.page.pubsub.send_all(message)

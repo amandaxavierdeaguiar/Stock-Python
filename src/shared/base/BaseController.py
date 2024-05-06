@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Generic, TypeVar, List
 
-from shared.Base.BaseResponse import BaseResponse
+from shared.base.BaseResponse import BaseResponse
 
 T = TypeVar("T")
 

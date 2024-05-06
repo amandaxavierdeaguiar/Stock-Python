@@ -1,11 +1,32 @@
 import flet as ft
 
+WIDTH = 400
 
-def disabled_textfield():
+
+def read_only_textfield():
     return {
-        "disabled": True,
-        "color": "#000000",
-        "border_color": "#000000",
+        "read_only": True,
+        "color": ft.colors.BLACK,
+        "border_color": ft.colors.BLACK,
+        "bgcolor": ft.colors.WHITE,
+        "focused_border_color": ft.colors.BLUE_400,
+        "width": WIDTH
+    }
+
+
+def dropbox():
+    return {
+        "color": ft.colors.BLACK,
+        "border_color": ft.colors.BLACK,
+        "bgcolor": ft.colors.WHITE,
+        "focused_bgcolor": ft.colors.GREY_200,
+        "width": WIDTH / 2 - 5
+    }
+
+
+def text():
+    return {
+        "color": ft.colors.BLACK,
         "bgcolor": ft.colors.WHITE,
     }
 

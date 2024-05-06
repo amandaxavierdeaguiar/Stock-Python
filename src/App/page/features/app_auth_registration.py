@@ -3,9 +3,9 @@ import os
 
 import flet as ft
 import pandas as pd
-from flet import UserControl
 from flet_core import Container
-from shared.Base.SharedControls import SharedControls
+
+from shared.base.SharedControls import SharedControls
 
 
 class AuthRegister(SharedControls):

@@ -4,9 +4,9 @@ from sqlalchemy import select
 
 from models.history.dto.ProductHistoryDto import ProductHistoryDto
 from models.history.orm.ProductHistoryOrm import ProductHistoryOrm
-from shared.Base.BaseRepository import BaseRepository, T
-from shared.Base.BaseResponse import BaseResponse
 from shared.Enums.TypeResult import TypeResult
+from shared.base.BaseRepository import BaseRepository, T
+from shared.base.BaseResponse import BaseResponse
 from shared.db.db_conection import get_session
 
 
@@ -18,7 +18,7 @@ class ProductHistoryRepository(BaseRepository[ProductHistoryOrm]):
 
     @classmethod
     def add(
-        cls, entity_dto: ProductHistoryDto, user_
+            cls, entity_dto: ProductHistoryDto, user_
     ) -> BaseResponse[ProductHistoryDto]:
         entity = None
         result = None
@@ -78,12 +78,12 @@ class ProductHistoryRepository(BaseRepository[ProductHistoryOrm]):
 
     @classmethod
     def update(
-        cls, entity: ProductHistoryDto, user_
+            cls, entity: ProductHistoryDto, user_
     ) -> BaseResponse[ProductHistoryDto]:
         pass
 
     @classmethod
     def delete(
-        cls, entity: ProductHistoryDto, user_
+            cls, entity: ProductHistoryDto, user_
     ) -> BaseResponse[ProductHistoryDto]:
         pass

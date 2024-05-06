@@ -1,11 +1,12 @@
 from typing import List
+
 from sqlalchemy import select
 
-from models.category.orm.CategoryOrm import CategoryOrm
 from models.category.dto.CategoryDto import CategoryDto
-from shared.Base.BaseRepository import BaseRepository
-from shared.Base.BaseResponse import BaseResponse
+from models.category.orm.CategoryOrm import CategoryOrm
 from shared.Enums.TypeResult import TypeResult
+from shared.base.BaseRepository import BaseRepository
+from shared.base.BaseResponse import BaseResponse
 from shared.db.db_conection import get_session
 
 

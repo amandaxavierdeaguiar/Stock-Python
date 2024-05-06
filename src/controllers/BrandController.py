@@ -1,7 +1,7 @@
 from models.brand.dto import BrandDto
 from repositories.BrandRepository import BrandRepository
-from shared.Base.BaseController import BaseController
-from shared.Base.BaseResponse import BaseResponse
+from shared.base.BaseController import BaseController
+from shared.base.BaseResponse import BaseResponse
 
 
 class BrandController(BaseController[BrandDto]):

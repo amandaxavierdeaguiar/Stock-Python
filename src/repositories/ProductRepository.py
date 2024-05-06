@@ -1,12 +1,12 @@
 from typing import List
-from sqlalchemy.orm import Session
-from sqlalchemy import insert, select, update
+
+from sqlalchemy import select, update
 
 from models.product.dto.Product import ProductDto
 from models.product.orm.Product import ProductOrm
-from shared.Base.BaseRepository import BaseRepository
-from shared.Base.BaseResponse import BaseResponse
 from shared.Enums.TypeResult import TypeResult
+from shared.base.BaseRepository import BaseRepository
+from shared.base.BaseResponse import BaseResponse
 from shared.db.db_conection import get_session
 
 

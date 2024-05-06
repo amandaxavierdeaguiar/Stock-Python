@@ -5,7 +5,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy.orm import Session
 
-from shared.Base.Base import Base
+from shared.base.Base import Base
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 db_path = os.path.join(BASE_DIR, "data_base.db")

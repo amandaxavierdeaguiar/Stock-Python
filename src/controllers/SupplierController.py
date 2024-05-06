@@ -1,7 +1,7 @@
 from models.supplier.dto import SupplierDto
 from repositories.SupplierRepository import SupplierRepository
-from shared.Base.BaseController import BaseController
-from shared.Base.BaseResponse import BaseResponse
+from shared.base.BaseController import BaseController
+from shared.base.BaseResponse import BaseResponse
 
 
 class SupplierController(BaseController[SupplierDto]):

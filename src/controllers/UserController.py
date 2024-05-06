@@ -1,7 +1,7 @@
 from models.user.dto.UserDto import UserDto
 from repositories.UserRepository import UserRepository
-from shared.Base.BaseController import BaseController
-from shared.Base.BaseResponse import BaseResponse
+from shared.base.BaseController import BaseController
+from shared.base.BaseResponse import BaseResponse
 
 
 class UserController(BaseController[UserDto]):

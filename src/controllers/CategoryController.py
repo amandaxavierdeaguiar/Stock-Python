@@ -2,8 +2,8 @@ from typing import List
 
 from models.category.dto import CategoryDto
 from repositories.CategoryRepository import CategoryRepository
-from shared.Base.BaseController import BaseController, T
-from shared.Base.BaseResponse import BaseResponse
+from shared.base.BaseController import BaseController, T
+from shared.base.BaseResponse import BaseResponse
 
 
 class CategoryController(BaseController[CategoryDto]):

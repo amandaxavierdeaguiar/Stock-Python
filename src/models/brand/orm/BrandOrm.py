@@ -1,10 +1,7 @@
 from sqlalchemy import Column, String, ForeignKey, Integer
 from sqlalchemy.orm import mapped_column, Mapped
 
-from shared.Base.Base import Base
-
-
-# from Models.supplier import SupplierOrm
+from shared.base.Base import Base
 
 
 class BrandOrm(Base):
