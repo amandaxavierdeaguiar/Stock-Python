@@ -59,8 +59,6 @@ class Charts(SharedControls):
             max_x=data["length"],
             expand=True,
         )
-        # return self.page.add(chart)
-        # return chart.update()
         return chart
 
     @classmethod

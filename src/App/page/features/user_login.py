@@ -4,14 +4,13 @@ from flet import TextField, Image
 from shared.base.SharedControls import SharedControls
 
 
-class AuthLogin(SharedControls):
+class UserLogin(SharedControls):
     def __init__(self, page, select_page, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.page = page
         self._image: Image = self.image()
         self._input_login: TextField = self.login(self.validate)
         self._input_password: TextField = self.password(self.validate)
-        self._checkbox_signup = self.checkbox_signup(self.validate)
         self._button_submit: ft.ElevatedButton = self.button_submit(
             var_on_click=self.login_alert
         )
@@ -22,7 +21,6 @@ class AuthLogin(SharedControls):
             self._image,
             self._input_login,
             self._input_password,
-            self._checkbox_signup,
             self._button_submit,
             self.button_signup,
         )
@@ -32,7 +30,6 @@ class AuthLogin(SharedControls):
                 [
                     self._input_login.value,
                     self._input_password.value,
-                    self._checkbox_signup.value,
                 ]
         ):
             self._button_submit.disabled = False
@@ -84,7 +81,7 @@ class AuthLogin(SharedControls):
         )
 
     @classmethod
-    def get_login(cls, image, login, password, checkbox, submit, signup):
+    def get_login(cls, image, login, password, submit, signup):
         return ft.Container(
             width=400,
             height=450,
@@ -98,7 +95,6 @@ class AuthLogin(SharedControls):
                             image,
                             login,
                             password,
-                            checkbox,
                         ],
                         alignment=ft.MainAxisAlignment.CENTER,
                         horizontal_alignment=ft.CrossAxisAlignment.CENTER,

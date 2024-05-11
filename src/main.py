@@ -30,7 +30,13 @@ def main(page: ft.Page):
     page.window_height = 645
     page.padding = padding.all(0)
     page.margin = margin.all(0)
-    page.bgcolor = ft.colors.GREY_200
+    # page.bgcolor = ft.colors.GREY_200
+    page.bgcolor = ft.colors.GREY_400
+    page.fonts = {
+        "font_app": "assets/fonts/Roboto-Medium.ttf",
+        "font_header": "assets/fonts/coolvetica rg.otf",
+    }
+    page.theme = ft.Theme(font_family="font_app")
     page.theme_mode = ft.ThemeMode.LIGHT
 
     app = App(page)

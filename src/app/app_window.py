@@ -48,16 +48,12 @@ class AppWindow(SharedControls):
             content = Container(expand=True, content=content_column)
             self.page.controls = [content]
             self.page.update()
-        # try:
-        #     self.page.update()
-        # except Exception as e:
-        #     print(e)
 
     def change_page(self, event=None):
         if event["login"]:
             self.__init__(self.init_page)
         elif not event["login"]:
-            self.__init__(page=self.init_page, user=self.user)
+            self.__init__(page=self.init_page)
 
     def is_portrait(self) -> bool:
         # Return true if window/display is narrow

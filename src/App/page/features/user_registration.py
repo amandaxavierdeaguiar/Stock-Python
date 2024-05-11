@@ -8,7 +8,7 @@ from flet_core import Container
 from shared.base.SharedControls import SharedControls
 
 
-class AuthRegister(SharedControls):
+class UserRegister(SharedControls):
     def __init__(self, var, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._input_name = self.name()

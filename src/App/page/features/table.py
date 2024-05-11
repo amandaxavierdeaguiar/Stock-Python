@@ -4,7 +4,7 @@ from flet import Container
 from shared.base.SharedControls import SharedControls
 
 
-class AppTable(SharedControls):
+class Table(SharedControls):
     """ """
 
     def __init__(self, app, page: ft.Page, *args, **kwargs):

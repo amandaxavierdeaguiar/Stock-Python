@@ -153,6 +153,10 @@ class ProductView(SharedControls):
         return base.entity["entity_"]
 
     def new_product(self):
+        """
+        metodo que cria uma alteração do preço de um certo produto escolhido de forma random
+        :return:
+        """
         base = self.ctrl_product.get_all(self.user)
         product = random.choice(base.entity["entity_"])
         product_dto = ProductDto.model_validate(product)
@@ -164,6 +168,10 @@ class ProductView(SharedControls):
         self.ctrl_product.update(product_dto, self.user)
 
     def new_stock(self):
+        """
+        metodo que cria uma alteração a quantidade em stock de um certo produto que escolhe random
+        :return:
+        """
         base = self.ctrl_stock.get_all(self.user)
         stock = random.choice(base.entity["entity_"])
         stock_dto = StockDto.model_validate(stock)
@@ -175,8 +183,12 @@ class ProductView(SharedControls):
         self.ctrl_stock.update(stock_dto, self.user)
 
     def new_from_list_product(self):
-        list = ListProduct.table_data
-        for product in list:
+        """
+        Metodo para adicionar novos produtos e o seu registo no stock que estejam no ficheiro ListProduct da pasta temp
+        :return:
+        """
+        list_product = ListProduct.table_data
+        for product in list_product:
             product_dto = ProductDto.model_validate(product)
             base = self.ctrl_product.add(product_dto, self.user)
             new_stock = {

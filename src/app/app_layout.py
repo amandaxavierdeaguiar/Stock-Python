@@ -3,8 +3,9 @@ from flet import Text, Column, icons, Control, IconButton, colors
 
 from app.page.app_menu import AppMenu
 from app.page.app_pages import AppPages
-from app.page.features.app_product_description import ProductDescription
-from app.page.features.app_product_edit import ProductEdit
+from app.page.url.app_product_description import ProductDescription
+from app.page.url.app_product_edit import ProductEdit
+from app.page.url.product_insert import ProductNew
 from shared.base.SharedControls import SharedControls
 from views.Product.ProductView import ProductView
 
@@ -15,8 +16,11 @@ class AppLayout(SharedControls):
     product_details: ft.BottomSheet
     content_area: Column
     navigation_rail: ft.NavigationRail
+    file_picker: ft.FilePicker
+    button_image: ft.ElevatedButton
     app_product_description = ProductDescription()
     app_product_edit = ProductEdit()
+    app_product_insert = ProductNew()
     product_view = ProductView()
     search = {
         'table': None,
@@ -109,42 +113,45 @@ class AppLayout(SharedControls):
         elif e.name == 'change':
             label, qnt = e.control.label.split('(')
             label = label.replace(' ', '')
-
-        if self.search['table'] != list_tables[e.control.data] and self.search['table'] is not None:
-            self.search['table'] = list_tables[e.control.data]
-            self.search['fields'].clear()
-            self.search['fields'].append([e.control.data, label])
+        if e.control.data != 'Stock_insert':
+            if self.search['table'] != list_tables[e.control.data] and self.search['table'] is not None:
+                self.search['table'] = list_tables[e.control.data]
+                self.search['fields'].clear()
+                self.search['fields'].append([e.control.data, label])
+            else:
+                self.search['table'] = list_tables[e.control.data]
+                self.search['fields'].append([e.control.data, label])
+            base = self.product_view.search(self.search)
+            page_number = self.navigation_rail.selected_index
+            new_search_panel = self.app_pages.create_search(self.checkbox_changed, base)
+            new_table = self.app_pages.create_content(view=page_number,
+                                                      row=self.row_selected,
+                                                      table="Stock",
+                                                      new_data=base.entity["entity_"])
+            self.content_area.controls[page_number].content = new_table
+            self.search_panel.content = new_search_panel.content
         else:
-            self.search['table'] = list_tables[e.control.data]
-            self.search['fields'].append([e.control.data, label])
-        base = self.product_view.search(self.search)
-        page_number = self.navigation_rail.selected_index
-        new_search_panel = self.app_pages.create_search(self.checkbox_changed, base)
-        new_table = self.app_pages.create_content(view=page_number,
-                                                  row=self.row_selected,
-                                                  table="Stock",
-                                                  new_data=base.entity["entity_"])
-        self.content_area.controls[page_number].content = new_table
-        self.search_panel.content = new_search_panel.content
+            await self.show_bs(table=e.control.data)
         self.page.update()
 
     @classmethod
     async def row_selected(cls, event):
         col_names = {
-            "Stock": ["product_name", "product_bar_cod", "supplier_name", "quantity"],
+            "Stock": ["product_name", "product_bar_cod", 'category_name', 'brand_name', 'description', 'photo',
+                      "supplier_name", "quantity", 'price', 'quantity_type'],
             "Supplier": ["name", "address", "phone", "email"],
             "User": ["name", "login", "password", "typeAccess"],
         }
         selected = {}
         for cells, col_name in zip(event.control.cells, col_names[event.control.data]):
             selected[col_name] = cells.content.value
-        await cls.show_bs(selected, event.control.data)
+        await cls.show_bs(selected=selected, table=event.control.data)
 
     @classmethod
     async def change_bs(cls, event):
         # await cls.close_bs(event)
         selected = cls.app_product_description.selected
-        await cls.show_bs(selected, event.control.data)
+        await cls.show_bs(selected=selected, table=event.control.data)
 
     @classmethod
     def details(cls):
@@ -165,17 +172,28 @@ class AppLayout(SharedControls):
         await cls.product_details.update_async()
 
     @classmethod
-    async def show_bs(cls, selected, table):
+    async def show_bs(cls, table, selected=None):
         # Alterar o description do Supplier e do User
         details = {
-            "Stock": cls.app_product_description.get_content(selected, show=cls.change_bs),
-            "Stock_edit": cls.app_product_edit.get_content(selected, show=cls.change_bs),
-            "Stock_insert": cls.app_product_description.get_content(selected, show=cls.change_bs),
-            "Supplier": cls.app_product_description.get_content(selected),
-            "User": cls.app_product_description.get_content(selected),
+            "Stock": cls.app_product_description,
+            "Stock_edit": cls.app_product_edit,
+            "Stock_insert": cls.app_product_insert,
+            "Supplier": cls.app_product_description,
+            "User": cls.app_product_description,
         }
-        content = details[table]
-        cls.product_details.content = content
+        if table == "Stock_insert":
+            cls.file_picker = ft.FilePicker(on_result=details[table].insert_img_product)
+            cls.button_image = ft.ElevatedButton(
+                text="Insira a Imagem",
+                on_click=lambda _: cls.file_picker.pick_files(
+                    allow_multiple=False, allowed_extensions=["jpg", "jpeg", "png"]
+                ),
+            )
+            content = details[table].get_content(button_image=cls.button_image, show=cls.change_bs)
+            cls.product_details.content = content
+        else:
+            content = details[table].get_content(selected=selected, show=cls.change_bs)
+            cls.product_details.content = content
         cls.product_details.open = True
         await cls.product_details.update_async()
 
@@ -188,10 +206,6 @@ class AppLayout(SharedControls):
     def will_unmount(self):
         self.page.overlay.remove(self.product_details)
         self.page.update()
-
-    # def select_page(self, page_number):
-    #     self.navigation_rail.selected_index = page_number
-    #     self._change_displayed_page()
 
     def _navigation_change(self, e):
         self._change_displayed_page()

@@ -3,6 +3,7 @@ from flet import (Column, Container, Row, Text, NavigationRail, NavigationRailDe
                   border_radius, colors, padding, margin)
 
 from shared.base.SharedControls import SharedControls
+from app.app_style import text_blue, menu
 
 
 class AppMenu(SharedControls):
@@ -28,13 +29,14 @@ class AppMenu(SharedControls):
             padding=padding.all(10),
             margin=margin.all(0),
             width=170,
-            bgcolor=colors.LIGHT_BLUE_ACCENT_700,
+            **menu()
+            # bgcolor=colors.LIGHT_BLUE_ACCENT_700,
         )
 
     @classmethod
     def create_menu_btn(cls, label_, icon_, type_=None):
         return NavigationRailDestination(
-            label_content=Text(label_, color=ft.colors.BLACK),
+            label_content=Text(label_, **text_blue()), #color=ft.colors.BLACK
             label=label_,
             icon=icon_,
             selected_icon=icon_,
@@ -47,7 +49,8 @@ class AppMenu(SharedControls):
                 selected_index=0,
                 label_type=ft.NavigationRailLabelType.ALL,
                 on_change=var_on_change,
-                bgcolor=colors.LIGHT_BLUE_ACCENT_700,
+                # bgcolor=colors.LIGHT_BLUE_ACCENT_700,
+                **menu(),
                 expand=True,
                 visible=False,
             )
@@ -56,7 +59,7 @@ class AppMenu(SharedControls):
                 selected_index=0,
                 label_type=ft.NavigationRailLabelType.ALL,
                 on_change=var_on_change,
-                bgcolor=colors.LIGHT_BLUE_ACCENT_700,
+                **menu(),
                 expand=True,
             )
 

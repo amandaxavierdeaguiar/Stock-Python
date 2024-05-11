@@ -1,16 +1,19 @@
 import flet as ft
 
 WIDTH = 400
+HALF_WIDTH = WIDTH / 2 - 5
 
 
-def read_only_textfield():
+def read_only_textfield(write=False, size=False):
     return {
-        "read_only": True,
+        # "read_only": True,
+        "read_only": False if write else True,
         "color": ft.colors.BLACK,
         "border_color": ft.colors.BLACK,
         "bgcolor": ft.colors.WHITE,
         "focused_border_color": ft.colors.BLUE_400,
-        "width": WIDTH
+        # "width": WIDTH if size else HALF_WIDTH,
+        "width": HALF_WIDTH if size else WIDTH,
     }
 
 
@@ -20,7 +23,7 @@ def dropbox():
         "border_color": ft.colors.BLACK,
         "bgcolor": ft.colors.WHITE,
         "focused_bgcolor": ft.colors.GREY_200,
-        "width": WIDTH / 2 - 5
+        "width": HALF_WIDTH
     }
 
 
@@ -86,3 +89,22 @@ def button():
             animation_duration=150,
         ),
     }
+
+
+def header_style():
+    return {
+        "bgcolor": ft.colors.AMBER_400,
+    }
+
+
+def menu():
+    return {
+        "bgcolor": ft.colors.AMBER_300,
+    }
+
+
+def text_blue():
+    return {
+        "color": ft.colors.INDIGO_900
+    }
+

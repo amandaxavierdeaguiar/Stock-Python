@@ -2,23 +2,19 @@ import flet as ft
 
 from app.app_style import title_pg
 from app.page.features.chart import Charts
-from app.page.features.fields_product import get_TextField, get_dropdown, get_text, get_image
+from app.page.features.fields_product import get_text_field, get_dropdown, get_text, get_image
+from shared.Enums.QuantityType import QuantityType
 from shared.base.SharedControls import SharedControls
 from views.Product.ProductView import ProductView
 
 
-# from app.features.app_product_edit import ProductEdit
-
-
-class ProductEdit(SharedControls):
+class ProductDescription(SharedControls):
     product_view = ProductView()
-    date_quantity = Charts()
+    charts = Charts()
     # product_edit = ProductEdit()
-
+    quantity_dropdown: ft.Dropdown
     txt_name_product: ft.TextField
     txt_price: ft.TextField
-    c: ft.TextField
-    b: ft.TextField
     description_db: ft.Container
     image_insert_product: ft.Image
     btn_edit: ft.ElevatedButton
@@ -28,35 +24,43 @@ class ProductEdit(SharedControls):
         super().__init__(*args, **kwargs)
         self.selected = None
 
-    def get_content(self, seleted, show=None):
-        self.selected = seleted
-        product = self.product_view.get_product(seleted["product_name"])
-        quantities = self.product_view.get_history_quantity(seleted["product_name"])
-        prices = self.product_view.get_history_prices(seleted["product_name"])
+    def get_content(self, selected, show=None):
+        self.selected = selected
+        product = self.product_view.get_product(selected["product_name"])
+        quantities = self.product_view.get_history_quantity(selected["product_name"])
+        prices = self.product_view.get_history_prices(selected["product_name"])
         # Colocar título
         title_product = ft.Text("Descrição do produto", **title_pg())
 
         # TextField nome do Produto
-        self.txt_name_product = get_TextField(product.name, 'Nome do Produto')
+        self.txt_name_product = get_text_field(product.name, 'Nome do Produto')
         # self.txt_name_product.disabled = True
 
         # TextField Valor do Produto
-        self.txt_price = get_TextField(product.price, "Valor do Produto")
+        self.txt_price = get_text_field(product.price, "Valor do Produto", size=True)
         # self.txt_price.disabled = True
 
         # TextField Categoria
         category = self.product_view.get_all_categories()
-        dropdown_category = get_dropdown("Categoria", category)
+        dropdown_category = get_dropdown("Categoria", disabled_=True, list=category)
+        dropdown_category.value = selected["category_name"]
 
         # TextField Brand
         brand = self.product_view.get_all_brands()
-        dropdown_brand = get_dropdown("Marca", brand)
+        dropdown_brand = get_dropdown("Marca", disabled_=True, list=brand,)
+        dropdown_brand.value = selected["brand_name"]
+
 
         # Descrição do Produto
         description_text = get_text(product.description)
 
         image_insert_product = get_image(product.photo)
         self.btn_edit = ft.ElevatedButton(text='Edit Product', on_click=show, data='Stock_edit')
+
+        # Quantity Type
+        quantity_ = QuantityType.return_types()
+        self.quantity_dropdown = get_dropdown("Unidade de Medida", disabled_=True, list=quantity_)
+        self.quantity_dropdown.value = selected["quantity_type"]
 
         container = ft.Container(
             width=1500,  # 1230
@@ -77,8 +81,7 @@ class ProductEdit(SharedControls):
                                         controls=[
                                             image_insert_product,
                                             # button_enter,
-                                            self.btn_edit,
-                                            self.btn_edit,
+                                            self.btn_edit
                                         ],
                                         alignment=ft.MainAxisAlignment.CENTER,
                                         horizontal_alignment=ft.CrossAxisAlignment.CENTER,
@@ -92,7 +95,13 @@ class ProductEdit(SharedControls):
                                         controls=[
                                             title_product,
                                             self.txt_name_product,
-                                            self.txt_price,
+                                            ft.Row(
+                                                controls=[
+                                                    self.txt_price,
+                                                    self.quantity_dropdown,
+                                                ],
+                                                alignment=ft.MainAxisAlignment.CENTER,
+                                            ),
                                             ft.Row(
                                                 controls=[
                                                     dropdown_brand,
@@ -109,6 +118,16 @@ class ProductEdit(SharedControls):
 
                                 alignment=ft.MainAxisAlignment.CENTER,
                             ),
+                        ],
+                    ),
+                    ft.Row(
+                        controls=[
+                            self.charts.create_chart(prices),
+                        ],
+                    ),
+                    ft.Row(
+                        controls=[
+                            self.charts.create_chart(quantities),
                         ],
                     ),
                 ],

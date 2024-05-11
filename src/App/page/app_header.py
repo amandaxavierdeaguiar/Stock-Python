@@ -10,7 +10,7 @@ from flet import (
 )
 
 from shared.base.SharedControls import SharedControls
-
+from app.app_style import text_blue, header_style
 
 class AppHeader(SharedControls):
     """ """
@@ -30,7 +30,7 @@ class AppHeader(SharedControls):
             ),
         ]
         self.appbar_logo = ft.Image(
-            src="icons/logo-stock.png",
+            src="icons/logo-stock-b.png",
             width=30,
             height=30,
             fit=ft.ImageFit.CONTAIN,
@@ -50,10 +50,11 @@ class AppHeader(SharedControls):
         return AppBar(
             leading=self.appbar_logo,
             leading_width=50,
-            title=Text("Stock Management", size=30, text_align=ft.TextAlign.CENTER),
+            title=Text("Stock Management", size=30, text_align=ft.TextAlign.CENTER, **text_blue(),
+                       style=ft.TextStyle(font_family="font_header")),
             center_title=False,
             toolbar_height=65,
-            bgcolor=colors.LIGHT_BLUE_ACCENT_700,
+            **header_style(),
             actions=[
                 Container(
                     padding=0,

@@ -1,7 +1,7 @@
 import flet as ft
 from flet import Text, Column, Card, Row, Container
 
-from app.page.features.app_table import AppTable
+from app.page.features.table import Table
 from controllers.StockController import StockController
 from controllers.SupplierController import SupplierController
 from controllers.UserController import UserController
@@ -39,7 +39,7 @@ class AppPages(SharedControls):
         base = list_repo[view]
         list_view = ft.ListView(
             controls=[
-                AppTable.get_table(
+                Table.get_table(
                     data=base.entity["entity_"] if new_data is None else new_data,
                     select=row,
                     table_name=table
@@ -73,6 +73,31 @@ class AppPages(SharedControls):
         return Container(
             content=Column(
                 [
+                    ft.Container(
+                        content=Text(
+                            "Insert", color=ft.colors.GREY_50, weight=ft.FontWeight.BOLD
+                        ),
+                        alignment=ft.alignment.center,
+                        bgcolor=ft.colors.BLACK54,
+                        margin=10,
+                        padding=5,
+                        height=30,
+                        border=ft.border.only(top=None),
+                        border_radius=ft.border_radius.only(top_left=10, top_right=10),
+                    ),
+                    ft.Container(
+                        expand=True,
+                        width=400,
+                        padding=20,
+                        content=ft.Column(
+                            controls=[
+                                # CAIXAS DA PESQUISA AQUI
+                                ft.ElevatedButton(text='Insert Product', on_click=var, data='Stock_insert')
+                            ],
+                            alignment=ft.MainAxisAlignment.CENTER,
+                            horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                        ),
+                    ),
                     ft.Container(
                         content=Text(
                             "Search", color=ft.colors.GREY_50, weight=ft.FontWeight.BOLD

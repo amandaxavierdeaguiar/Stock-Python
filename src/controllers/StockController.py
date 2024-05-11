@@ -50,6 +50,10 @@ class StockController(BaseController[StockDto]):
 
     @classmethod
     def update(cls, entity_dto: StockDto, user_) -> BaseResponse[StockDto]:
+        return cls.repo.update(entity_dto, user_)
+
+    @classmethod
+    def update_quantity(cls, entity_dto: StockDto, user_) -> BaseResponse[StockDto]:
         base = cls.repo.update(entity_dto, user_)
         if base.result == TypeResult.Success:
             to_pass = {

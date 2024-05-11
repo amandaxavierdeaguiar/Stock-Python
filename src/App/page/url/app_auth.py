@@ -1,8 +1,8 @@
 import flet as ft
 from flet import Text, Column, Control
 
-from app.page.features.app_auth_login import AuthLogin
-from app.page.features.app_auth_registration import AuthRegister
+from app.page.features.user_login import UserLogin
+from app.page.features.user_registration import UserRegister
 from shared.base.SharedControls import SharedControls
 
 
@@ -10,8 +10,8 @@ class AppAuth(SharedControls):
     def __init__(self, page, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.page = page
-        self.auth_login = AuthLogin(self.page, select_page=self.select_page)
-        self.auth_register = AuthRegister(self.select_page)
+        self.auth_login = UserLogin(self.page, select_page=self.select_page)
+        self.auth_register = UserRegister(self.select_page)
         self.default_page = 0
         self.btn_login_signup = self.auth_login.button_signup
         self.btn_signup_submit = self.auth_register.button_cancel
