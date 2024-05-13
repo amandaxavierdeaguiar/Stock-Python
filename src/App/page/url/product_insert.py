@@ -1,13 +1,15 @@
 import base64
+import os
 
 import flet as ft
 from flet import colors, icons, IconButton
 
-from shared.Enums.QuantityType import QuantityType
 from app.app_style import title_pg, button
 from app.page.features.fields_product import get_text_field, get_dropdown, get_text
+from shared.Enums.QuantityType import QuantityType
 from shared.base.SharedControls import SharedControls
 from views.Product.ProductView import ProductView
+
 
 class ProductNew(SharedControls):
     product_view = ProductView()
@@ -23,12 +25,11 @@ class ProductNew(SharedControls):
     img_Container: ft.Stack
     quantity_dropdown: ft.Dropdown
 
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
     @classmethod
-    def get_content(cls, button_image, show=None):
+    def get_content(cls, file_picker, show=None):
         # Colocar título
         title_product = ft.Text("Insira o produto", **title_pg())
 
@@ -49,7 +50,8 @@ class ProductNew(SharedControls):
         cls.description_text = get_text()
 
         cls.button_enter = ft.ElevatedButton(
-            **button(), icon=icons.SAVE,
+            **button(),
+            icon=icons.SAVE,
             text="Insira o produto",
             on_click=lambda _: print("Insiriu o produto na Base de Dados"),
         )
@@ -76,11 +78,9 @@ class ProductNew(SharedControls):
             visible=False,
         )
 
-        file_picker = ft.FilePicker(on_result=cls.insert_img_product)
-        # self.page.overlay.append(file_picker)
-
         cls.button_image = ft.ElevatedButton(
-            **button(), icon=icons.UPLOAD_FILE,
+            **button(),
+            icon=icons.UPLOAD_FILE,
             text="Insira a Imagem",
             on_click=lambda _: file_picker.pick_files(
                 allow_multiple=False, allowed_extensions=["jpg", "jpeg", "png"]
@@ -90,7 +90,6 @@ class ProductNew(SharedControls):
         # Quantity Type
         quantity_ = QuantityType.return_types()
         cls.quantity_dropdown = get_dropdown("Unidade de Medida", list=quantity_)
-
 
         container = ft.Container(
             width=650,
@@ -108,7 +107,8 @@ class ProductNew(SharedControls):
                                 controls=[
                                     cls.image_insert_product,
                                     cls.img_Container,
-                                    button_image,
+                                    file_picker,
+                                    cls.button_image,
                                     cls.button_enter,
                                 ],
                                 spacing=20,
@@ -137,11 +137,37 @@ class ProductNew(SharedControls):
 
     @classmethod
     def insert_img_product(cls, e: ft.FilePickerResultEvent):
-        print(e.files)
         if e.files and len(e.files):
-            with open(e.files[0].path, "rb") as r:
-                cls.image_insert_product.src_base64 = base64.b64encode(r.read()).decode("utf-8")
+            file_path = e.files[0].path
+            with open(file_path, 'rb') as f:
+                image_content = f.read()
 
+                # Obter a extensão do arquivo usando o método os.path.splitext
+                file_name, file_extension = os.path.splitext(file_path)
+
+                # Diretório de destino para salvar a imagem
+                directory = os.path.abspath('assets/products')
+                if not os.path.exists(directory):
+                    os.makedirs(directory)
+
+                # Nome do produto em letras minúsculas, separado por _
+                name_text = cls.txt_name_product.value.strip().lower().split()
+                name_separate = "_".join(name_text)
+                file_name = name_separate + file_extension
+
+                # Converte a imagem em base64 para exibição
+                img_base64 = base64.b64encode(image_content).decode('utf-8')
+                cls.image_insert_product.src = f'{directory}/{file_name}'
+
+                cls.image_insert_product.data = file_name
+                # Inclui com o Fábio
+                # data para identificar o que é aquele campo
+
+                # Salvar o arquivo no diretório
+                with open(os.path.join(directory, file_name), 'wb') as w:
+                    w.write(image_content)
+
+                # Atualiza a interface gráfica
                 cls.img_Container.visible = True
                 cls.btn_close_img.visible = True
                 cls.image_insert_product.visible = True
@@ -152,8 +178,6 @@ class ProductNew(SharedControls):
     def close_img(cls, e):
         cls.img_Container.visible = not cls.img_Container.visible
         cls.btn_close_img.visible = not cls.btn_close_img.visible
-
-
 
 
 if __name__ == "__main__":

@@ -5,7 +5,6 @@ from shared.base.SharedControls import SharedControls
 
 
 class Table(SharedControls):
-    """ """
 
     def __init__(self, app, page: ft.Page, *args, **kwargs):
         super().__init__(*args, **kwargs)

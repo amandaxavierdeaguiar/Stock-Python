@@ -3,6 +3,7 @@ from flet import Text, Column, icons, Control, IconButton, colors
 
 from app.page.app_menu import AppMenu
 from app.page.app_pages import AppPages
+from app.page.url.app_insert_supplier import InsertSupplier
 from app.page.url.app_product_description import ProductDescription
 from app.page.url.app_product_edit import ProductEdit
 from app.page.url.product_insert import ProductNew
@@ -18,9 +19,11 @@ class AppLayout(SharedControls):
     navigation_rail: ft.NavigationRail
     file_picker: ft.FilePicker
     button_image: ft.ElevatedButton
+    alert_img: ft.AlertDialog
     app_product_description = ProductDescription()
     app_product_edit = ProductEdit()
     app_product_insert = ProductNew()
+    app_supplier_insert = InsertSupplier()
     product_view = ProductView()
     search = {
         'table': None,
@@ -33,32 +36,26 @@ class AppLayout(SharedControls):
         self.details()
         self.app_menu = AppMenu(self.page)
         self.app_pages = AppPages(self.page, self.user)
-        ft.FilePicker()
 
         pages = [
             (
-                self.app_menu.create_menu_btn(
-                    label_="Stock", icon_=icons.WAREHOUSE_OUTLINED
-                ),
-                self.app_pages.create_content(
-                    view=0, row=self.row_selected, table="Stock"
-                ),
+                self.app_menu.create_menu_btn(label_="Stock", icon_=icons.WAREHOUSE_OUTLINED),
+                self.app_pages.create_content(view=0, row=self.row_selected, table="Stock"),
+                self.app_pages.create_search(self.checkbox_changed, table="Stock")
             ),
             (
                 self.app_menu.create_menu_btn(label_="Supplier", icon_=icons.PERSON_2),
-                self.app_pages.create_content(
-                    view=1, row=self.row_selected, table="Supplier"
-                ),
+                self.app_pages.create_content(view=1, row=self.row_selected, table="Supplier"),
+                self.app_pages.create_search(self.checkbox_changed, table="Supplier")
             ),
             (
                 self.app_menu.create_menu_btn(label_="User", icon_=icons.PERSON),
-                self.app_pages.create_content(
-                    view=2, row=self.row_selected, table="User"
-                ),
+                self.app_pages.create_content(view=2, row=self.row_selected, table="User"),
+                self.app_pages.create_search(self.checkbox_changed, table="User")
             ),
         ]
 
-        self.navigation_items = [navigation_item for navigation_item, _ in pages]
+        self.navigation_items = [navigation_item for navigation_item, _, _ in pages]
         self.navigation_rail = self.app_menu.build_navigation_rail(
             self._navigation_change
         )
@@ -67,9 +64,10 @@ class AppLayout(SharedControls):
         self.navigation_rail.extended = True
 
         self.menu_panel = self.app_menu.get_menu(self.navigation_rail)
-        self.search_panel = self.app_pages.create_search(self.checkbox_changed)
+        page_searches = [page_search for _, _, page_search in pages]
+        self.search_panel = Column(controls=page_searches, expand=False)
 
-        page_contents = [page_content for _, page_content in pages]
+        page_contents = [page_content for _, page_content, _ in pages]
         self.content_area = Column(controls=page_contents, expand=True)
 
         self.toggle_menu_panel = IconButton(
@@ -113,7 +111,7 @@ class AppLayout(SharedControls):
         elif e.name == 'change':
             label, qnt = e.control.label.split('(')
             label = label.replace(' ', '')
-        if e.control.data != 'Stock_insert':
+        if e.control.data in '_insert':
             if self.search['table'] != list_tables[e.control.data] and self.search['table'] is not None:
                 self.search['table'] = list_tables[e.control.data]
                 self.search['fields'].clear()
@@ -172,24 +170,26 @@ class AppLayout(SharedControls):
         await cls.product_details.update_async()
 
     @classmethod
+    async def create_file_picker(cls, details, table):
+        cls.file_picker = ft.FilePicker(on_result=details[table].insert_img_product, data='new_file_picker')
+        return cls.file_picker
+
+    @classmethod
     async def show_bs(cls, table, selected=None):
         # Alterar o description do Supplier e do User
         details = {
             "Stock": cls.app_product_description,
             "Stock_edit": cls.app_product_edit,
             "Stock_insert": cls.app_product_insert,
-            "Supplier": cls.app_product_description,
+            "Supplier_insert": cls.app_supplier_insert,
             "User": cls.app_product_description,
         }
         if table == "Stock_insert":
-            cls.file_picker = ft.FilePicker(on_result=details[table].insert_img_product)
-            cls.button_image = ft.ElevatedButton(
-                text="Insira a Imagem",
-                on_click=lambda _: cls.file_picker.pick_files(
-                    allow_multiple=False, allowed_extensions=["jpg", "jpeg", "png"]
-                ),
-            )
-            content = details[table].get_content(button_image=cls.button_image, show=cls.change_bs)
+            file_picker = await cls.create_file_picker(details, table)
+            content = details[table].get_content(file_picker, show=cls.change_bs)
+            cls.product_details.content = content
+        elif table == 'Supplier_insert':
+            content = details[table].get_content(show=cls.change_bs)
             cls.product_details.content = content
         else:
             content = details[table].get_content(selected=selected, show=cls.change_bs)
@@ -214,9 +214,10 @@ class AppLayout(SharedControls):
 
     def _change_displayed_page(self):
         page_number = self.navigation_rail.selected_index
-        for i, content_page in enumerate(self.content_area.controls):
+        for i, (content_page, search_panel) in enumerate(zip(self.content_area.controls, self.search_panel.controls)):
             # update selected page
             content_page.visible = page_number == i
+            search_panel.visible = page_number == i
             # self.content_area.update()
             self.page.update()
 
